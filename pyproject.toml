@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "yanat"
+version = "0.0.1"
+description = "Yet Another Network Analysis Toolbox"
+authors = ["Kayson Fakhar, Shrey Dixit"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+msapy = "^1.6"
+numba = "^0.59.0"
+numpy = "^1.26.4"
+scipy = "^1.12.0"
+
+[tool.poetry.dev-dependencies]
+typeguard = "^2.13"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

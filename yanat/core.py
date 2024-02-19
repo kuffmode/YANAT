@@ -11,7 +11,7 @@ from msapy.datastructures import ShapleyModeND
 
 from copy import deepcopy
 
-import utils as ut
+from yanat import utils as ut
 
 @njit
 def identity(x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:

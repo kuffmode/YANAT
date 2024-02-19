@@ -274,6 +274,7 @@ def optimal_influence(n_elements:int, game:callable = default_game, game_kwargs:
     oi = msa.estimate_causal_influences(
     elements=list(range(n_elements)),
     objective_function=game,
-    objective_function_params=game_kwargs)
+    objective_function_params=game_kwargs,
+    **msa_kwargs)
     
     return oi

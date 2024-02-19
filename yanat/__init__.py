@@ -1,3 +1,3 @@
-from core import *
-from utils import *
-__version__ = '0.0.1'
+from yanat import core
+from yanat import utils
+__version__ = '0.0.2'

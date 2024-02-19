@@ -1,35 +1,28 @@
-name: Publish Python Package
+name: Upload Python Package
 
 on:
   push:
-    branches:
-      - main  # Trigger on push to main branch
+    branches: main
 
 jobs:
-  build-and-publish:
-    runs-on: ubuntu-latest  # Run on latest Ubuntu
+  pypi-publish:
+    name: Upload release to PyPI
+    runs-on: ubuntu-latest
+    
     permissions:
       id-token: write
 
     steps:
-    - uses: actions/checkout@v2  # Check out the repository code
-
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
-        python-version: '3.8'  # Set the Python version
-
-    - name: Install Poetry
+        python-version: '3.10'
+    - name: Install dependencies
       run: |
-        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-        echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-
-    - name: Configure Poetry
-      run: |
-        poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}  # Configure PyPI token
-
-    - name: Build and publish
-      run: |
-        poetry build
+        python -m pip install --upgrade pip
+        pip install build
+    - name: Build package
+      run: python -m build
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1

@@ -5,7 +5,7 @@ with open("docs/README.md", encoding="utf-8") as f:
     LONG_DESCRIPTION = f.read()
 
 setup(name="Yanat",
-      version="0.0.1",
+      version="0.0.5",
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
       long_description_content_type='text/markdown',

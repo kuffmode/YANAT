@@ -74,14 +74,19 @@ def spectral_normalization(
 
 
 def strength_normalization(adjacency_matrix: np.ndarray) -> np.ndarray:
-    """Normalizes the adjacency matrix to subside the effect of high-strength nodes.
-    See https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484 for more details.
+    """
+    Normalizes the adjacency matrix to subside the effect of high-strength (or high-degree) nodes.
+    This function implements the strength normalization algorithm described in [1].
+    The algorithm aims to reduce the influence of high-strength nodes in a network by scaling the adjacency matrix.
 
-    Args:
-        adjacency_matrix (np.ndarray): Adjacency matrix of the network.
+    Parameters:
+        adjacency_matrix (np.ndarray): The adjacency matrix of the network. It should be a square matrix of shape (n, n), where n is the number of nodes in the network.
 
     Returns:
-        np.ndarray: Normalized adjacency matrix with the same shape as the input.
+        np.ndarray: The normalized adjacency matrix with the same shape as the input.
+
+    References:
+        [1] https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484
     """
     strength: np.ndarray = adjacency_matrix.sum(1)
     normalized_strength: np.ndarray = np.power(strength, -0.5)
@@ -91,10 +96,19 @@ def strength_normalization(adjacency_matrix: np.ndarray) -> np.ndarray:
 
 
 def optimal_influence_default_values(adjacency_matrix:np.ndarray, location:str = "adjacency_matrices_for_oi", random_seed:int = 11) -> dict:
-    """Returns the default values for the parameters of the optimal_influence function.
+    """
+    Returns the default values for the parameters of the optimal_influence function.
+
+    Parameters:
+        adjacency_matrix (np.ndarray): The adjacency matrix representing the network structure.
+        location (str, optional): The location to save the adjacency matrix file. Defaults to "adjacency_matrices_for_oi".
+        random_seed (int, optional): The random seed for generating input noise. Defaults to 11.
 
     Returns:
         dict: Default values for the parameters of the optimal_influence function.
+    
+    # TODO: allow already pickled adjacency matrices to be used as input.
+    # TODO: allow the user to specify an arbitrary parameter while keeping the rest as default.
     """
     rng:Generator = np.random.default_rng(seed=random_seed)
     NOISE_STRENGTH:float = 1
@@ -117,3 +131,5 @@ def optimal_influence_default_values(adjacency_matrix:np.ndarray, location:str =
     game_params:dict = {"adjacency_matrix": f"{file_location}.pkl", "input_noise": input_noise, "model_params": model_params}
 
     return game_params
+
+# TODO: add a function to create example adjacency matrices for demonstration purposes.

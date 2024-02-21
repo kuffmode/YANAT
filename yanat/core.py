@@ -24,6 +24,8 @@ def identity(x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
 
     Returns:
         Union[float, np.ndarray]: output. will be whatever the input is!
+        
+    # TODO: Maybe this can go to utils instead.
     """
     return x
 
@@ -38,6 +40,8 @@ def tanh(x: Union[float, int, np.ndarray]) -> Union[float, np.ndarray]:
 
     Returns:
         Union[float, np.ndarray]: output, squashed between -1 and 1.
+    
+    # TODO: Maybe this can go to utils instead.
     """
     return np.tanh(x)
 
@@ -50,6 +54,8 @@ def relu(x: Union[float, int, np.ndarray]) -> Union[float, np.ndarray]:
 
     Returns:
         Union[float, np.ndarray]: output, squashed between 0 and 1.
+    
+    # TODO: Maybe this can go to utils instead.
     """
     return np.maximum(0.0, x)
 
@@ -66,9 +72,11 @@ def simulate_dynamical_system(adjacency_matrix: np.ndarray,
     Simulates a dynamical system described by the given paramteres.
 
     Args:
-        adjacency_matrix (np.ndarray): The adjacency matrix (N,N; duh)
+        adjacency_matrix (np.ndarray): The adjacency matrix (N,N) make sure the matrix is normalized so the system remain stable.
+            we can use `ut.spectral_normalization(1,A)` to normalize the matrix A.
         input_matrix (np.ndarray): Input of shape (N, T) where N is the number of nodes and T is the number of time steps.
         coupling (float, optional): The coupling strength between each node (scales the adjacency_matrix). Defaults to 1.
+            This is another thing to take care of. If the system is unstable, try to reduce the coupling, like to 0.9.
         dt (float, optional): The time step of the simulation. Defaults to 0.001.
         duration (int, optional): The duration of the simulation in seconds. Defaults to 10.
         timeconstant (float, optional): The time constant of the nodes, I think it's the same as the 'relaxation time'. Defaults to 0.01.
@@ -76,6 +84,8 @@ def simulate_dynamical_system(adjacency_matrix: np.ndarray,
 
     Returns:
         np.ndarray: The state of the dynamical system at each time step so again, the shape is (N, T)
+    
+    # TODO: Add examples and tests
     """
 
     N: int = input_matrix.shape[0]
@@ -91,7 +101,6 @@ def simulate_dynamical_system(adjacency_matrix: np.ndarray,
             function(connectivity @ X[:, timepoint -
                      1] + input_matrix[:, timepoint - 1])
 
-    # TODO: Add examples and tests
     return X
 
 
@@ -206,6 +215,8 @@ def communicability(adjacency_matrix: np.ndarray, alpha:float = 1, normalize: bo
     References:
     [1] https://arxiv.org/abs/2307.02449
     [2] https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484
+    
+    # TODO: Add examples and tests
     """   
     
     if normalize:
@@ -225,11 +236,11 @@ def communicability(adjacency_matrix: np.ndarray, alpha:float = 1, normalize: bo
 
 @typechecked
 def default_game(complements: tuple, 
-                       adjacency_matrix: Union[np.ndarray,str], 
-                       index: int, 
-                       input_noise: np.ndarray,
-                       model: callable = simulate_dynamical_system, 
-                       model_params:Optional[dict]=None) -> np.ndarray:
+                 adjacency_matrix: Union[np.ndarray,str], 
+                 index: int, 
+                 input_noise: np.ndarray,
+                 model: callable = simulate_dynamical_system, 
+                 model_params:Optional[dict]=None) -> np.ndarray:
     """
     Lesions the given nodes and simulates the dynamics of the system afterwards. Lesioning here means setting the incoming and outgoing
     connections of the node to zero
@@ -245,33 +256,51 @@ def default_game(complements: tuple,
 
     Returns:
         np.ndarray: Resulted activity of the target node given the lesion. Shape is (T,)
+        
+    # TODO: Add examples and tests
     """
     model_params = model_params if model_params else {}
 
     if isinstance(adjacency_matrix, str):
         with open(adjacency_matrix, 'rb') as f:
-            lesioned_connectivity = pk.load(f)
+            lesioned_connectivity:np.ndarray = pk.load(f)
             
     elif isinstance(adjacency_matrix, np.ndarray):
-        lesioned_connectivity = deepcopy(adjacency_matrix)
+        lesioned_connectivity:np.ndarray = deepcopy(adjacency_matrix)
     else:
         raise ValueError("The adjacency matrix must be either a numpy array or a path to a pickle file containing the matrix.")
     
     lesioned_connectivity[:, complements] = 0.0
     lesioned_connectivity[complements, :] = 0.0
 
-    dynamics = model(adjacency_matrix = lesioned_connectivity, input_matrix=input_noise, **model_params)
-    lesioned_signal = dynamics[index]
+    dynamics:np.ndarray = model(adjacency_matrix = lesioned_connectivity, input_matrix=input_noise, **model_params)
+    lesioned_signal:np.ndarray = dynamics[index]
     return lesioned_signal
 
 
 @typechecked
 def optimal_influence(n_elements:int, game:callable = default_game, game_kwargs:Optional[dict]=None, msa_kwargs:Optional[dict]=None) -> ShapleyModeND:
+    """
+    Estimates the optimal influence of each node in a given network using the MSA algorithm. Note that this function might take considerable time,
+    like even days or weeks to run, depending on the size of the network and computational power of your system. 
+    My personal recommendation is to try with fewer than 200 nodes on normal desktop computers but go on a server if there are more nodes.
+    On my own computer with 16 threads, it took about 2h to run a network of N=150 nodes.
+
+    Args:
+        n_elements (int): The number of elements in the game (nodes in the network).
+        game (callable, optional): The game function to be used for estimating the optimal influence. Defaults to default_game.
+        game_kwargs (dict, optional): Additional keyword arguments to pass to the game function.
+        msa_kwargs (dict, optional): Additional keyword arguments to pass to the MSA.
+
+    Returns:
+        ShapleyModeND: The estimated optimal influence of each node over the others.
+
+    # TODO: Add examples and tests
+"""
+    game_kwargs:dict = game_kwargs if game_kwargs else {}
+    msa_kwargs:dict = msa_kwargs if msa_kwargs else {}
     
-    game_kwargs = game_kwargs if game_kwargs else {}
-    msa_kwargs = msa_kwargs if msa_kwargs else {}
-    
-    oi = msa.estimate_causal_influences(
+    oi: ShapleyModeND = msa.estimate_causal_influences(
     elements=list(range(n_elements)),
     objective_function=game,
     objective_function_params=game_kwargs,

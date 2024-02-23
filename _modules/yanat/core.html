@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>yanat.core &mdash; YANAT 0.0.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=1fd71caa"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            YANAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">YANAT</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">YANAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yanat.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for yanat.core</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">njit</span>
+<span class="kn">from</span> <span class="nn">typeguard</span> <span class="kn">import</span> <span class="n">typechecked</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">expm</span><span class="p">,</span> <span class="n">solve</span>
+<span class="kn">import</span> <span class="nn">_pickle</span> <span class="k">as</span> <span class="nn">pk</span>
+<span class="kn">from</span> <span class="nn">msapy</span> <span class="kn">import</span> <span class="n">msa</span>
+<span class="kn">from</span> <span class="nn">msapy.datastructures</span> <span class="kn">import</span> <span class="n">ShapleyModeND</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">from</span> <span class="nn">yanat</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">ut</span>
+
+<div class="viewcode-block" id="identity">
+<a class="viewcode-back" href="../../yanat.html#yanat.core.identity">[docs]</a>
+<span class="nd">@njit</span>
+<span class="k">def</span> <span class="nf">identity</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The identity function. It&#39;s for the linear case and I literally stole it from Fabrizio:</span>
+<span class="sd">        https://github.com/fabridamicelli/echoes/blob/master/echoes/utils.py</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (Union[float, np.ndarray]): input. can be a float or an np array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Union[float, np.ndarray]: output. will be whatever the input is!</span>
+<span class="sd">        </span>
+<span class="sd">    # TODO: Maybe this can go to utils instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="tanh">
+<a class="viewcode-back" href="../../yanat.html#yanat.core.tanh">[docs]</a>
+<span class="nd">@njit</span>
+<span class="k">def</span> <span class="nf">tanh</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the hyperbolic tangent of the input. Again, I stole this from Fabrizio:</span>
+<span class="sd">    https://github.com/fabridamicelli/echoes/blob/master/echoes/utils.py</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (Union[float, int, np.ndarray]): input. can be a float or an np array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Union[float, np.ndarray]: output, squashed between -1 and 1.</span>
+<span class="sd">    </span>
+<span class="sd">    # TODO: Maybe this can go to utils instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="relu">
+<a class="viewcode-back" href="../../yanat.html#yanat.core.relu">[docs]</a>
+<span class="nd">@njit</span>
+<span class="k">def</span> <span class="nf">relu</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the relu of the input:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        x (Union[float, int, np.ndarray]): input. can be a float or an np array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Union[float, np.ndarray]: output, squashed between 0 and 1.</span>
+<span class="sd">    </span>
+<span class="sd">    # TODO: Maybe this can go to utils instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="simulate_dynamical_system">
+<a class="viewcode-back" href="../../yanat.html#yanat.core.simulate_dynamical_system">[docs]</a>
+<span class="nd">@njit</span>
+<span class="k">def</span> <span class="nf">simulate_dynamical_system</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                              <span class="n">input_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                              <span class="n">coupling</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                              <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span>
+                              <span class="n">duration</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+                              <span class="n">timeconstant</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+                              <span class="n">function</span><span class="p">:</span> <span class="nb">callable</span> <span class="o">=</span> <span class="n">identity</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                              <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simulates a dynamical system described by the given paramteres.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        adjacency_matrix (np.ndarray): The adjacency matrix (N,N) make sure the matrix is normalized so the system remain stable.</span>
+<span class="sd">        we can use `ut.spectral_normalization(1,A)` to normalize the matrix A.</span>
+<span class="sd">        input_matrix (np.ndarray): Input of shape (N, T) where N is the number of nodes and T is the number of time steps.</span>
+<span class="sd">        coupling (float, optional): The coupling strength between each node (scales the adjacency_matrix). Defaults to 1.</span>
+<span class="sd">        This is another thing to take care of. If the system is unstable, try to reduce the coupling, like to 0.9.</span>
+<span class="sd">        dt (float, optional): The time step of the simulation. Defaults to 0.001.</span>
+<span class="sd">        duration (int, optional): The duration of the simulation in seconds. Defaults to 10.</span>
+<span class="sd">        timeconstant (float, optional): The time constant of the nodes, I think it&#39;s the same as the &#39;relaxation time&#39;. Defaults to 0.01.</span>
+<span class="sd">        function (Callable, optional): The activation function. Defaults to identity, which means it&#39;s linear.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: The state of the dynamical system at each time step so again, the shape is (N, T)</span>
+<span class="sd">    </span>
+<span class="sd">    # TODO: Add examples and tests</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">N</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">input_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">T</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">duration</span> <span class="o">/</span> <span class="n">dt</span><span class="p">)</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">T</span><span class="p">))</span>
+
+    <span class="n">decay_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">timeconstant</span>
+    <span class="n">connectivity</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">adjacency_matrix</span><span class="o">*</span><span class="n">coupling</span>
+
+    <span class="k">for</span> <span class="n">timepoint</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+
+        <span class="n">X</span><span class="p">[:,</span> <span class="n">timepoint</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">decay_factor</span><span class="p">)</span> <span class="o">*</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">timepoint</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">decay_factor</span> <span class="o">*</span> \
+            <span class="n">function</span><span class="p">(</span><span class="n">connectivity</span> <span class="o">@</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">timepoint</span> <span class="o">-</span>
+                     <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">input_matrix</span><span class="p">[:,</span> <span class="n">timepoint</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">X</span></div>
+
+
+
+<div class="viewcode-block" id="sar">
+<a class="viewcode-back" href="../../yanat.html#yanat.core.sar">[docs]</a>
+<span class="nd">@typechecked</span>
+<span class="k">def</span> <span class="nf">sar</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Computes the analytical covariance matrix for the spatial autoregressive (SAR) model. </span>
+
+<span class="sd">    The SAR model considers each region&#39;s activity as a weighted sum of fluctuations from</span>
+<span class="sd">    other regions, adjusted by a spatial influence factor &#39;alpha&#39;, plus a unit-variance Gaussian noise.</span>
+<span class="sd">    The covariance matrix is analytically derived as the inverse of (I - alpha * A) times its transpose.</span>
+<span class="sd">    See [1]. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        adjacency_matrix (np.ndarray): A square, nonnegative, and symmetric matrix representing network&#39;s structure.</span>
+<span class="sd">        alpha (float): The spatial influence factor, should be less than the spectral radius of &#39;adjacency_matrix&#39;.</span>
+<span class="sd">        The smaller the decay rate, the quicker it assumes the walks to be subsiding.</span>
+<span class="sd">        normalize (bool, optional): If True, normalizes the matrix using strength normalization described by [2]. Defaults to False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: The covariance matrix of the SAR model. Shape: (N, N)</span>
+<span class="sd">    </span>
+<span class="sd">    References:</span>
+<span class="sd">    [1] https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003530</span>
+<span class="sd">    [2] https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</span>
+<span class="sd">    </span>
+<span class="sd">    # TODO: Add examples and tests</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span> <span class="c1"># `ut.strength_normalization` is a defined utility function, don&#39;t worry, I got you covered love.</span>
+        <span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">strength_normalization</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+        
+    <span class="n">N</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">I</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="c1"># Check if the user has given a shit about the documentation.</span>
+    <span class="k">if</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">N</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The adjacency matrix must be square. Like Spongebob&#39;s pants.&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">adjacency_matrix</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The adjacency matrix contains negative values. Unless we figure out some stuff, only nonnegative matrices are allowed.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Do some magic.</span>
+    <span class="n">inverse_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">adjacency_matrix</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">assume_a</span><span class="o">=</span><span class="s1">&#39;sym&#39;</span><span class="p">)</span>
+    <span class="n">influence_matrix</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">inverse_matrix</span> <span class="o">@</span> <span class="n">inverse_matrix</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">influence_matrix</span></div>
+
+
+
+<div class="viewcode-block" id="lam">
+<a class="viewcode-back" href="../../yanat.html#yanat.core.lam">[docs]</a>
+<span class="nd">@typechecked</span>
+<span class="k">def</span> <span class="nf">lam</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the influence matrix for the Linear Attenuation Model (LAM), which underpins</span>
+<span class="sd">    the dynamics of Katz centrality and is similar to communicability, but with a linear</span>
+<span class="sd">    discount on longer walks rather than an exponential one. The discount factor &#39;alpha&#39;</span>
+<span class="sd">    should be less than the spectral radius of the adjacency matrix. See [1] for more details.</span>
+
+<span class="sd">    Note from Gorka Zamora-lopez on directed graphs: For the adjacency matrix &#39;A&#39;, A_{ij} = 1 indicates j --&gt; i,</span>
+<span class="sd">    which is the opposite of the conventional graph theory notation. If your adjacency</span>
+<span class="sd">    matrices follow the graph theory convention, ensure to transpose it first.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        adjacency_matrix (np.ndarray): A square and nonnegative matrix representing network&#39;s structure.</span>
+<span class="sd">        alpha (float): the decay rate. The smaller the decay rate, the quicker it assumes the walks to be subsiding.</span>
+<span class="sd">        normalize (bool, optional): If True, applies strength normalization [2] to the matrix. Defaults to False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: The influence matrix for LAM. Shape: (N, N)</span>
+<span class="sd">        </span>
+<span class="sd">    References:</span>
+<span class="sd">    [1] https://arxiv.org/abs/2307.02449</span>
+<span class="sd">    [2] https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</span>
+<span class="sd">    </span>
+<span class="sd">    # TODO: Add examples and tests</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span> <span class="c1"># `ut.strength_normalization` is a defined utility function, don&#39;t worry suger, I got you covered.</span>
+        <span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">strength_normalization</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+    
+    <span class="n">N</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">I</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+    <span class="c1"># Check if the user has given a shit about the documentation.</span>
+    <span class="k">if</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">N</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The adjacency matrix must be square. Like Spongebob&#39;s pants.&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">adjacency_matrix</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The adjacency matrix contains negative values. Unless we figure out some stuff, only nonnegative matrices are allowed.&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Do some skibidi bapbap.</span>
+    <span class="n">influence_matrix</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">adjacency_matrix</span><span class="p">,</span> <span class="n">I</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">influence_matrix</span></div>
+
+
+
+<div class="viewcode-block" id="communicability">
+<a class="viewcode-back" href="../../yanat.html#yanat.core.communicability">[docs]</a>
+<span class="nd">@typechecked</span>
+<span class="k">def</span> <span class="nf">communicability</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the communicability of the network, with the option to be scaled by a decay rate factor &#39;alpha&#39;.</span>
+<span class="sd">    The alpha factor modulates the decay rate of walks, with smaller values leading</span>
+<span class="sd">    to quicker subsidence. Alpha should be in the range (0, spectral radius of A).</span>
+<span class="sd">    Works for binary, weighted, and directed graphs. See [1] for more details.</span>
+
+<span class="sd">    Note from Gorka Zamora-lopez on directed graphs: For the adjacency matrix &#39;A&#39;, A_{ij} = 1 indicates j --&gt; i,</span>
+<span class="sd">    which is the opposite of the conventional graph theory notation. If your adjacency</span>
+<span class="sd">    matrices follow the graph theory convention, ensure to transpose it first.</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        adjacency_matrix (np.ndarray): A square and nonnegative matrix representing network&#39;s structure.</span>
+<span class="sd">        alpha (float, optional): The scaling factor. Defaults to 1, meaning that no scaling is applied.</span>
+<span class="sd">        normalize (bool, optional): If True, applies strength normalization to the matrix [2]. Defaults to False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: The (scaled) communicability matrix. Shape: (N, N)</span>
+<span class="sd">        </span>
+<span class="sd">    References:</span>
+<span class="sd">    [1] https://arxiv.org/abs/2307.02449</span>
+<span class="sd">    [2] https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</span>
+<span class="sd">    </span>
+<span class="sd">    # TODO: Add examples and tests</span>
+<span class="sd">    &quot;&quot;&quot;</span>   
+    
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">strength_normalization</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+    
+    <span class="c1"># Check if the user has given a shit about the documentation.</span>
+    <span class="k">if</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The adjacency matrix must be square. Like Spongebob&#39;s pants.&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">adjacency_matrix</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The adjacency matrix contains negative values. Unless we figure out some stuff, only nonnegative matrices are allowed.&quot;</span><span class="p">)</span>    
+
+    <span class="n">adjacency_matrix</span> <span class="o">*=</span> <span class="n">alpha</span>
+    <span class="n">communicability_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">communicability_matrix</span></div>
+
+
+
+<div class="viewcode-block" id="default_game">
+<a class="viewcode-back" href="../../yanat.html#yanat.core.default_game">[docs]</a>
+<span class="nd">@typechecked</span>
+<span class="k">def</span> <span class="nf">default_game</span><span class="p">(</span><span class="n">complements</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> 
+                 <span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="nb">str</span><span class="p">],</span> 
+                 <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                 <span class="n">input_noise</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                 <span class="n">model</span><span class="p">:</span> <span class="nb">callable</span> <span class="o">=</span> <span class="n">simulate_dynamical_system</span><span class="p">,</span> 
+                 <span class="n">model_params</span><span class="p">:</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lesions the given nodes and simulates the dynamics of the system afterwards. Lesioning here means setting the incoming and outgoing</span>
+<span class="sd">    connections of the node to zero</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    complements (tuple): Indices of nodes to be lesioned. Comes from MSA, don&#39;t worry about it suger.</span>
+<span class="sd">    adjacency_matrix (Union[np.ndarray, str]): The adjacency matrix representing the system</span>
+<span class="sd">    or a path to a pickle file containing the adjacency matrix. The pickling thing makes it faster so I recommend that.</span>
+<span class="sd">    index (int): Index of the target node whose activity is to be returned. Also comes from MSA.</span>
+<span class="sd">    input_noise (np.ndarray): Input noise/signal for the dynamical model. Shape (N,T).</span>
+<span class="sd">    model (callable, optional): The dynamical system model function to simulate with. Defaults to a linear dynamical system.</span>
+<span class="sd">    model_params (dict, optional): Additional keyword arguments to pass to the model function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: Resulted activity of the target node given the lesion. Shape is (T,)</span>
+<span class="sd">        </span>
+<span class="sd">    # TODO: Add examples and tests</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model_params</span> <span class="o">=</span> <span class="n">model_params</span> <span class="k">if</span> <span class="n">model_params</span> <span class="k">else</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lesioned_connectivity</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">pk</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">lesioned_connectivity</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The adjacency matrix must be either a numpy array or a path to a pickle file containing the matrix.&quot;</span><span class="p">)</span>
+    
+    <span class="n">lesioned_connectivity</span><span class="p">[:,</span> <span class="n">complements</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">lesioned_connectivity</span><span class="p">[</span><span class="n">complements</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">dynamics</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">adjacency_matrix</span> <span class="o">=</span> <span class="n">lesioned_connectivity</span><span class="p">,</span> <span class="n">input_matrix</span><span class="o">=</span><span class="n">input_noise</span><span class="p">,</span> <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+    <span class="n">lesioned_signal</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">dynamics</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">lesioned_signal</span></div>
+
+
+
+<div class="viewcode-block" id="optimal_influence">
+<a class="viewcode-back" href="../../yanat.html#yanat.core.optimal_influence">[docs]</a>
+<span class="nd">@typechecked</span>
+<span class="k">def</span> <span class="nf">optimal_influence</span><span class="p">(</span><span class="n">n_elements</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">game</span><span class="p">:</span><span class="nb">callable</span> <span class="o">=</span> <span class="n">default_game</span><span class="p">,</span> <span class="n">game_kwargs</span><span class="p">:</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msa_kwargs</span><span class="p">:</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ShapleyModeND</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimates the optimal influence of each node in a given network using the MSA algorithm. Note that this function might take considerable time,</span>
+<span class="sd">    like even days or weeks to run, depending on the size of the network and computational power of your system. </span>
+<span class="sd">    My personal recommendation is to try with fewer than 200 nodes on normal desktop computers but go on a server if there are more nodes.</span>
+<span class="sd">    On my own computer with 16 threads, it took about 2h to run a network of N=150 nodes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n_elements (int): The number of elements in the game (nodes in the network).</span>
+<span class="sd">        game (callable, optional): The game function to be used for estimating the optimal influence. Defaults to default_game.</span>
+<span class="sd">        game_kwargs (dict, optional): Additional keyword arguments to pass to the game function.</span>
+<span class="sd">        msa_kwargs (dict, optional): Additional keyword arguments to pass to the MSA.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ShapleyModeND: The estimated optimal influence of each node over the others.</span>
+
+<span class="sd">    # TODO: Add examples and tests</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    <span class="n">game_kwargs</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="n">game_kwargs</span> <span class="k">if</span> <span class="n">game_kwargs</span> <span class="k">else</span> <span class="p">{}</span>
+    <span class="n">msa_kwargs</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="n">msa_kwargs</span> <span class="k">if</span> <span class="n">msa_kwargs</span> <span class="k">else</span> <span class="p">{}</span>
+    
+    <span class="n">oi</span><span class="p">:</span> <span class="n">ShapleyModeND</span> <span class="o">=</span> <span class="n">msa</span><span class="o">.</span><span class="n">estimate_causal_influences</span><span class="p">(</span>
+    <span class="n">elements</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_elements</span><span class="p">)),</span>
+    <span class="n">objective_function</span><span class="o">=</span><span class="n">game</span><span class="p">,</span>
+    <span class="n">objective_function_params</span><span class="o">=</span><span class="n">game_kwargs</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">msa_kwargs</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">oi</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Kayson Fakhar, Shrey Dixit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

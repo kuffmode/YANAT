@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>yanat package &mdash; YANAT 0.0.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=1fd71caa"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="YANAT" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            YANAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">YANAT</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">yanat package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-yanat.core">yanat.core module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.core.communicability"><code class="docutils literal notranslate"><span class="pre">communicability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.core.default_game"><code class="docutils literal notranslate"><span class="pre">default_game()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.core.identity"><code class="docutils literal notranslate"><span class="pre">identity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.core.lam"><code class="docutils literal notranslate"><span class="pre">lam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.core.optimal_influence"><code class="docutils literal notranslate"><span class="pre">optimal_influence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.core.relu"><code class="docutils literal notranslate"><span class="pre">relu()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.core.sar"><code class="docutils literal notranslate"><span class="pre">sar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.core.simulate_dynamical_system"><code class="docutils literal notranslate"><span class="pre">simulate_dynamical_system()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.core.tanh"><code class="docutils literal notranslate"><span class="pre">tanh()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-yanat.utils">yanat.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.utils.find_density"><code class="docutils literal notranslate"><span class="pre">find_density()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.utils.log_minmax_normalize"><code class="docutils literal notranslate"><span class="pre">log_minmax_normalize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.utils.log_normalize"><code class="docutils literal notranslate"><span class="pre">log_normalize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.utils.minmax_normalize"><code class="docutils literal notranslate"><span class="pre">minmax_normalize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.utils.optimal_influence_default_values"><code class="docutils literal notranslate"><span class="pre">optimal_influence_default_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.utils.spectral_normalization"><code class="docutils literal notranslate"><span class="pre">spectral_normalization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yanat.utils.strength_normalization"><code class="docutils literal notranslate"><span class="pre">strength_normalization()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-yanat">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">YANAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">YANAT</a></li>
+      <li class="breadcrumb-item active">yanat package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/yanat.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="yanat-package">
+<h1>yanat package<a class="headerlink" href="#yanat-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-yanat.core">
+<span id="yanat-core-module"></span><h2>yanat.core module<a class="headerlink" href="#module-yanat.core" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.core.communicability">
+<span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">communicability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#communicability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.communicability" title="Link to this definition"></a></dt>
+<dd><p>Computes the communicability of the network, with the option to be scaled by a decay rate factor ‘alpha’.
+The alpha factor modulates the decay rate of walks, with smaller values leading
+to quicker subsidence. Alpha should be in the range (0, spectral radius of A).
+Works for binary, weighted, and directed graphs. See [1] for more details.</p>
+<p>Note from Gorka Zamora-lopez on directed graphs: For the adjacency matrix ‘A’, A_{ij} = 1 indicates j –&gt; i,
+which is the opposite of the conventional graph theory notation. If your adjacency
+matrices follow the graph theory convention, ensure to transpose it first.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): A square and nonnegative matrix representing network’s structure.
+alpha (float, optional): The scaling factor. Defaults to 1, meaning that no scaling is applied.
+normalize (bool, optional): If True, applies strength normalization to the matrix [2]. Defaults to False.</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: The (scaled) communicability matrix. Shape: (N, N)</p>
+</dd>
+</dl>
+<p>References:
+[1] <a class="reference external" href="https://arxiv.org/abs/2307.02449">https://arxiv.org/abs/2307.02449</a>
+[2] <a class="reference external" href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484">https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</a></p>
+<p># TODO: Add examples and tests</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.core.default_game">
+<span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">default_game</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">complements:</span> <span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjacency_matrix:</span> <span class="pre">~numpy.ndarray</span> <span class="pre">|</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_noise:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model:</span> <span class="pre">callable</span> <span class="pre">=</span> <span class="pre">CPUDispatcher(&lt;function</span> <span class="pre">simulate_dynamical_system&gt;)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_params:</span> <span class="pre">dict</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#default_game"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.default_game" title="Link to this definition"></a></dt>
+<dd><p>Lesions the given nodes and simulates the dynamics of the system afterwards. Lesioning here means setting the incoming and outgoing
+connections of the node to zero</p>
+<p>Args:
+complements (tuple): Indices of nodes to be lesioned. Comes from MSA, don’t worry about it suger.
+adjacency_matrix (Union[np.ndarray, str]): The adjacency matrix representing the system
+or a path to a pickle file containing the adjacency matrix. The pickling thing makes it faster so I recommend that.
+index (int): Index of the target node whose activity is to be returned. Also comes from MSA.
+input_noise (np.ndarray): Input noise/signal for the dynamical model. Shape (N,T).
+model (callable, optional): The dynamical system model function to simulate with. Defaults to a linear dynamical system.
+model_params (dict, optional): Additional keyword arguments to pass to the model function.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>np.ndarray: Resulted activity of the target node given the lesion. Shape is (T,)</p>
+</dd>
+</dl>
+<p># TODO: Add examples and tests</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.core.identity">
+<span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">identity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#identity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.identity" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>The identity function. It’s for the linear case and I literally stole it from Fabrizio:</dt><dd><p><a class="reference external" href="https://github.com/fabridamicelli/echoes/blob/master/echoes/utils.py">https://github.com/fabridamicelli/echoes/blob/master/echoes/utils.py</a></p>
+</dd>
+<dt>Args:</dt><dd><p>x (Union[float, np.ndarray]): input. can be a float or an np array.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Union[float, np.ndarray]: output. will be whatever the input is!</p>
+</dd>
+</dl>
+<p># TODO: Maybe this can go to utils instead.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.core.lam">
+<span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">lam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#lam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.lam" title="Link to this definition"></a></dt>
+<dd><p>Computes the influence matrix for the Linear Attenuation Model (LAM), which underpins
+the dynamics of Katz centrality and is similar to communicability, but with a linear
+discount on longer walks rather than an exponential one. The discount factor ‘alpha’
+should be less than the spectral radius of the adjacency matrix. See [1] for more details.</p>
+<p>Note from Gorka Zamora-lopez on directed graphs: For the adjacency matrix ‘A’, A_{ij} = 1 indicates j –&gt; i,
+which is the opposite of the conventional graph theory notation. If your adjacency
+matrices follow the graph theory convention, ensure to transpose it first.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): A square and nonnegative matrix representing network’s structure.
+alpha (float): the decay rate. The smaller the decay rate, the quicker it assumes the walks to be subsiding.
+normalize (bool, optional): If True, applies strength normalization [2] to the matrix. Defaults to False.</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: The influence matrix for LAM. Shape: (N, N)</p>
+</dd>
+</dl>
+<p>References:
+[1] <a class="reference external" href="https://arxiv.org/abs/2307.02449">https://arxiv.org/abs/2307.02449</a>
+[2] <a class="reference external" href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484">https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</a></p>
+<p># TODO: Add examples and tests</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.core.optimal_influence">
+<span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">optimal_influence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_elements:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game:</span> <span class="pre">callable</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">default_game&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_kwargs:</span> <span class="pre">dict</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msa_kwargs:</span> <span class="pre">dict</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ShapleyModeND</span></span></span><a class="reference internal" href="_modules/yanat/core.html#optimal_influence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.optimal_influence" title="Link to this definition"></a></dt>
+<dd><p>Estimates the optimal influence of each node in a given network using the MSA algorithm. Note that this function might take considerable time,
+like even days or weeks to run, depending on the size of the network and computational power of your system. 
+My personal recommendation is to try with fewer than 200 nodes on normal desktop computers but go on a server if there are more nodes.
+On my own computer with 16 threads, it took about 2h to run a network of N=150 nodes.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>n_elements (int): The number of elements in the game (nodes in the network).
+game (callable, optional): The game function to be used for estimating the optimal influence. Defaults to default_game.
+game_kwargs (dict, optional): Additional keyword arguments to pass to the game function.
+msa_kwargs (dict, optional): Additional keyword arguments to pass to the MSA.</p>
+</dd>
+<dt>Returns:</dt><dd><p>ShapleyModeND: The estimated optimal influence of each node over the others.</p>
+</dd>
+</dl>
+<p># TODO: Add examples and tests</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.core.relu">
+<span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">relu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#relu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.relu" title="Link to this definition"></a></dt>
+<dd><p>Computes the relu of the input:
+Args:</p>
+<blockquote>
+<div><p>x (Union[float, int, np.ndarray]): input. can be a float or an np array.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Union[float, np.ndarray]: output, squashed between 0 and 1.</p>
+</dd>
+</dl>
+<p># TODO: Maybe this can go to utils instead.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.core.sar">
+<span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">sar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#sar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.sar" title="Link to this definition"></a></dt>
+<dd><p>Computes the analytical covariance matrix for the spatial autoregressive (SAR) model.</p>
+<blockquote>
+<div><p>The SAR model considers each region’s activity as a weighted sum of fluctuations from
+other regions, adjusted by a spatial influence factor ‘alpha’, plus a unit-variance Gaussian noise.
+The covariance matrix is analytically derived as the inverse of (I - alpha * A) times its transpose.
+See [1].</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): A square, nonnegative, and symmetric matrix representing network’s structure.
+alpha (float): The spatial influence factor, should be less than the spectral radius of ‘adjacency_matrix’.
+The smaller the decay rate, the quicker it assumes the walks to be subsiding.
+normalize (bool, optional): If True, normalizes the matrix using strength normalization described by [2]. Defaults to False.</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: The covariance matrix of the SAR model. Shape: (N, N)</p>
+</dd>
+</dl>
+<p>References:
+[1] <a class="reference external" href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003530">https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003530</a>
+[2] <a class="reference external" href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484">https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</a></p>
+<p># TODO: Add examples and tests</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.core.simulate_dynamical_system">
+<span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">simulate_dynamical_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_matrix:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coupling:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeconstant:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function:</span> <span class="pre">callable</span> <span class="pre">=</span> <span class="pre">CPUDispatcher(&lt;function</span> <span class="pre">identity&gt;)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#simulate_dynamical_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.simulate_dynamical_system" title="Link to this definition"></a></dt>
+<dd><p>Simulates a dynamical system described by the given paramteres.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): The adjacency matrix (N,N) make sure the matrix is normalized so the system remain stable.
+we can use <cite>ut.spectral_normalization(1,A)</cite> to normalize the matrix A.
+input_matrix (np.ndarray): Input of shape (N, T) where N is the number of nodes and T is the number of time steps.
+coupling (float, optional): The coupling strength between each node (scales the adjacency_matrix). Defaults to 1.
+This is another thing to take care of. If the system is unstable, try to reduce the coupling, like to 0.9.
+dt (float, optional): The time step of the simulation. Defaults to 0.001.
+duration (int, optional): The duration of the simulation in seconds. Defaults to 10.
+timeconstant (float, optional): The time constant of the nodes, I think it’s the same as the ‘relaxation time’. Defaults to 0.01.
+function (Callable, optional): The activation function. Defaults to identity, which means it’s linear.</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: The state of the dynamical system at each time step so again, the shape is (N, T)</p>
+</dd>
+</dl>
+<p># TODO: Add examples and tests</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.core.tanh">
+<span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">tanh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#tanh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.tanh" title="Link to this definition"></a></dt>
+<dd><p>Computes the hyperbolic tangent of the input. Again, I stole this from Fabrizio:
+<a class="reference external" href="https://github.com/fabridamicelli/echoes/blob/master/echoes/utils.py">https://github.com/fabridamicelli/echoes/blob/master/echoes/utils.py</a></p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x (Union[float, int, np.ndarray]): input. can be a float or an np array.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Union[float, np.ndarray]: output, squashed between -1 and 1.</p>
+</dd>
+</dl>
+<p># TODO: Maybe this can go to utils instead.</p>
+</dd></dl>
+
+</section>
+<section id="module-yanat.utils">
+<span id="yanat-utils-module"></span><h2>yanat.utils module<a class="headerlink" href="#module-yanat.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.utils.find_density">
+<span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">find_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#find_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.find_density" title="Link to this definition"></a></dt>
+<dd><p>Finds the density of the given adjacency matrix. It’s the ratio of the number of edges to the number of possible edges.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): The adjacency matrix of the network.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The density of the network.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.utils.log_minmax_normalize">
+<span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">log_minmax_normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#log_minmax_normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.log_minmax_normalize" title="Link to this definition"></a></dt>
+<dd><p>It first takes the logarithm of the data and then normalizes it between 0 and 1. It also takes care of the infinit values and those nasty things.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): Adjacency matrix of the network. Technically can be any matrix but I did it for the adjacency matrices.</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Normalized data with the same shape as the input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.utils.log_normalize">
+<span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">log_normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#log_normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.log_normalize" title="Link to this definition"></a></dt>
+<dd><p>Returns the logarithm of the data (adjacency_matrix) but also takes care of the infinit values.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): Adjacency matrix of the network. Technically can be any matrix but I did it for the adjacency matrices.</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Normalized data with the same shape as the input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.utils.minmax_normalize">
+<span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">minmax_normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#minmax_normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.minmax_normalize" title="Link to this definition"></a></dt>
+<dd><p>Normalizes data between 0 and 1.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>data (Union[pd.DataFrame, np.ndarray]): Data to be normalized. Can be a DataFrame or an np array but in both cases it should be at most 2D.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Union[pd.DataFrame, np.ndarray]: Normalized data with the same shape as the input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.utils.optimal_influence_default_values">
+<span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">optimal_influence_default_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'adjacency_matrices_for_oi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">11</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#optimal_influence_default_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.optimal_influence_default_values" title="Link to this definition"></a></dt>
+<dd><p>Returns the default values for the parameters of the optimal_influence function.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>adjacency_matrix (np.ndarray): The adjacency matrix representing the network structure.
+location (str, optional): The location to save the adjacency matrix file. Defaults to “adjacency_matrices_for_oi”.
+random_seed (int, optional): The random seed for generating input noise. Defaults to 11.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Default values for the parameters of the optimal_influence function.</p>
+</dd>
+</dl>
+<p># TODO: allow already pickled adjacency matrices to be used as input.
+# TODO: allow the user to specify an arbitrary parameter while keeping the rest as default.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.utils.spectral_normalization">
+<span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">spectral_normalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#spectral_normalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.spectral_normalization" title="Link to this definition"></a></dt>
+<dd><p>Normalizes the adjacency matrix to have a spectral radius of the target_radius. Good to keep the system stable.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>target_radius (float): A value below 1.0. It’s the spectral radius that you want to achieve. But use 1.0 if you’re planning to change the global coupling strength somewhere.
+adjacency_matrix (np.ndarray): Adjacency matrix of the network.</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Normalized adjacency matrix with the same shape as the input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.utils.strength_normalization">
+<span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">strength_normalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#strength_normalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.strength_normalization" title="Link to this definition"></a></dt>
+<dd><p>Normalizes the adjacency matrix to subside the effect of high-strength (or high-degree) nodes.
+This function implements the strength normalization algorithm described in [1].
+The algorithm aims to reduce the influence of high-strength nodes in a network by scaling the adjacency matrix.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>adjacency_matrix (np.ndarray): The adjacency matrix of the network. It should be a square matrix of shape (n, n), where n is the number of nodes in the network.</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: The normalized adjacency matrix with the same shape as the input.</p>
+</dd>
+<dt>References:</dt><dd><p>[1] <a class="reference external" href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484">https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-yanat">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yanat" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="YANAT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Kayson Fakhar, Shrey Dixit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

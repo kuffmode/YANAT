@@ -11,6 +11,7 @@ So, not to kill the vibe here but `yanat` was firstly designed to make computing
 Anyway, let's say you have a network called `connectivity` as a `np.ndarray` adjacency matrix. For the sake of these examples, we assume they are undirected and positively weighted. To make sure the dynamics of the network are well-behaved (stable and happy, unlike Nietzsche), we can normalize the adjacency matrix using the spectral normalization function.
 
 ```python
+from yanat import core, utils as ut
 connectivity = ut.spectral_normalization(1,connectivity)
 ```
 

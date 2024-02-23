@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from yanat.utils import identity, tanh, sar, lam
+from yanat.core import identity, tanh, sar, lam
 
 
 # The function returns the input value if it's a float or an np array.

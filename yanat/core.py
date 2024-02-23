@@ -73,10 +73,10 @@ def simulate_dynamical_system(adjacency_matrix: np.ndarray,
 
     Args:
         adjacency_matrix (np.ndarray): The adjacency matrix (N,N) make sure the matrix is normalized so the system remain stable.
-            we can use `ut.spectral_normalization(1,A)` to normalize the matrix A.
+        we can use `ut.spectral_normalization(1,A)` to normalize the matrix A.
         input_matrix (np.ndarray): Input of shape (N, T) where N is the number of nodes and T is the number of time steps.
         coupling (float, optional): The coupling strength between each node (scales the adjacency_matrix). Defaults to 1.
-            This is another thing to take care of. If the system is unstable, try to reduce the coupling, like to 0.9.
+        This is another thing to take care of. If the system is unstable, try to reduce the coupling, like to 0.9.
         dt (float, optional): The time step of the simulation. Defaults to 0.001.
         duration (int, optional): The duration of the simulation in seconds. Defaults to 10.
         timeconstant (float, optional): The time constant of the nodes, I think it's the same as the 'relaxation time'. Defaults to 0.01.
@@ -248,7 +248,7 @@ def default_game(complements: tuple,
     Args:
     complements (tuple): Indices of nodes to be lesioned. Comes from MSA, don't worry about it suger.
     adjacency_matrix (Union[np.ndarray, str]): The adjacency matrix representing the system
-            or a path to a pickle file containing the adjacency matrix. The pickling thing makes it faster so I recommend that.
+    or a path to a pickle file containing the adjacency matrix. The pickling thing makes it faster so I recommend that.
     index (int): Index of the target node whose activity is to be returned. Also comes from MSA.
     input_noise (np.ndarray): Input noise/signal for the dynamical model. Shape (N,T).
     model (callable, optional): The dynamical system model function to simulate with. Defaults to a linear dynamical system.

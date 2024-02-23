@@ -11,8 +11,14 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        
+        with:
+          python-version: '3.11' # Replace '3.x' with your Python version
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -

@@ -27,14 +27,12 @@ jobs:
       - name: Install project dependencies with Poetry
         run: |
           poetry install --no-root
-      - name: Sphinx build
+      - name: Build the docs
         run: |
-          sphinx-build doc _build
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          cd docs && make clean html
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
         with:
-          publish_branch: gh-pages
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _build/
-          force_orphan: true
+            path: 'docs/_build/html'
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v2

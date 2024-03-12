@@ -25,7 +25,6 @@ def identity(x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
     Returns:
         Union[float, np.ndarray]: output. will be whatever the input is!
         
-    # TODO: Maybe this can go to utils instead.
     """
     return x
 
@@ -41,7 +40,6 @@ def tanh(x: Union[float, int, np.ndarray]) -> Union[float, np.ndarray]:
     Returns:
         Union[float, np.ndarray]: output, squashed between -1 and 1.
     
-    # TODO: Maybe this can go to utils instead.
     """
     return np.tanh(x)
 
@@ -55,7 +53,6 @@ def relu(x: Union[float, int, np.ndarray]) -> Union[float, np.ndarray]:
     Returns:
         Union[float, np.ndarray]: output, squashed between 0 and 1.
     
-    # TODO: Maybe this can go to utils instead.
     """
     return np.maximum(0.0, x)
 
@@ -84,8 +81,6 @@ def simulate_dynamical_system(adjacency_matrix: np.ndarray,
 
     Returns:
         np.ndarray: The state of the dynamical system at each time step so again, the shape is (N, T)
-    
-    # TODO: Add examples and tests
     """
 
     N: int = input_matrix.shape[0]
@@ -98,9 +93,7 @@ def simulate_dynamical_system(adjacency_matrix: np.ndarray,
     for timepoint in range(1, T):
 
         X[:, timepoint] = ((1-decay_factor) * X[:, timepoint - 1]) + decay_factor * \
-            function(connectivity @ X[:, timepoint -
-                     1] + input_matrix[:, timepoint - 1])
-
+            function(connectivity @ X[:, timepoint - 1] + input_matrix[:, timepoint - 1])
     return X
 
 
@@ -124,10 +117,10 @@ def sar(adjacency_matrix: np.ndarray, alpha:float = 0.5, normalize: bool = False
         np.ndarray: The covariance matrix of the SAR model. Shape: (N, N)
     
     References:
-    [1] https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003530
-    [2] https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484
     
-    # TODO: Add examples and tests
+    [1] https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003530
+    
+    [2] https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484
     """
     if normalize: # `ut.strength_normalization` is a defined utility function, don't worry, I got you covered love.
         adjacency_matrix: np.ndarray = ut.strength_normalization(adjacency_matrix)
@@ -144,6 +137,7 @@ def sar(adjacency_matrix: np.ndarray, alpha:float = 0.5, normalize: bool = False
     # Do some magic.
     inverse_matrix:np.ndarray = solve(I - alpha * adjacency_matrix, I, assume_a='sym')
     influence_matrix:np.ndarray = inverse_matrix @ inverse_matrix.T
+
     return influence_matrix
 
 
@@ -168,10 +162,10 @@ def lam(adjacency_matrix: np.ndarray, alpha:float = 0.5, normalize: bool = False
         np.ndarray: The influence matrix for LAM. Shape: (N, N)
         
     References:
-    [1] https://arxiv.org/abs/2307.02449
-    [2] https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484
     
-    # TODO: Add examples and tests
+    [1] https://arxiv.org/abs/2307.02449
+    
+    [2] https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484
     """
     if normalize: # `ut.strength_normalization` is a defined utility function, don't worry suger, I got you covered.
         adjacency_matrix: np.ndarray = ut.strength_normalization(adjacency_matrix)
@@ -216,7 +210,6 @@ def communicability(adjacency_matrix: np.ndarray, alpha:float = 1, normalize: bo
     [1] https://arxiv.org/abs/2307.02449
     [2] https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484
     
-    # TODO: Add examples and tests
     """   
     
     if normalize:
@@ -284,7 +277,8 @@ def optimal_influence(n_elements:int, game:callable = default_game, game_kwargs:
     Estimates the optimal influence of each node in a given network using the MSA algorithm. Note that this function might take considerable time,
     like even days or weeks to run, depending on the size of the network and computational power of your system. 
     My personal recommendation is to try with fewer than 200 nodes on normal desktop computers but go on a server if there are more nodes.
-    On my own computer with 16 threads, it took about 2h to run a network of N=150 nodes.
+    On my own computer with 16 threads, it took about 2h to run a network of N=150 nodes. Also, you don't need to run your simulations for long, even 1 second is enough.
+    However, if you have delayed systems then make sure the delay is less than 1 second otherwise the source technically doesn't have time to influence the target.
 
     Args:
         n_elements (int): The number of elements in the game (nodes in the network).
@@ -293,10 +287,8 @@ def optimal_influence(n_elements:int, game:callable = default_game, game_kwargs:
         msa_kwargs (dict, optional): Additional keyword arguments to pass to the MSA.
 
     Returns:
-        ShapleyModeND: The estimated optimal influence of each node over the others.
-
-    # TODO: Add examples and tests
-"""
+        ShapleyModeND: The estimated optimal influence of each node over the others at each time point. This is basically a multi-index pandas dataframe.
+    """
     game_kwargs:dict = game_kwargs if game_kwargs else {}
     msa_kwargs:dict = msa_kwargs if msa_kwargs else {}
     

@@ -6,17 +6,18 @@
 Welcome to YANAT's documentation!
 =================================
 
+.. include:: ../README.md
+   :parser: myst_parser.sphinx_
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 0
    :caption: Contents:
 
    modules
 
+.. Indices and tables
+.. ==================
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`

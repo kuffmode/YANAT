@@ -1,10 +1,5 @@
-yanat package
-=============
 
-Submodules
-----------
-
-yanat.core module
+yanat.core
 -----------------
 
 .. automodule:: yanat.core
@@ -12,7 +7,7 @@ yanat.core module
    :undoc-members:
    :show-inheritance:
 
-yanat.utils module
+yanat.utils
 ------------------
 
 .. automodule:: yanat.utils
@@ -20,10 +15,3 @@ yanat.utils module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: yanat
-   :members:
-   :undoc-members:
-   :show-inheritance:

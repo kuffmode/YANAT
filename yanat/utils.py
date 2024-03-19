@@ -9,6 +9,7 @@ from sklearn.model_selection import ParameterGrid
 from tqdm import tqdm
 from copy import deepcopy
 
+
 def find_density(adjacency_matrix: np.ndarray) -> float:
     """Finds the density of the given adjacency matrix. It's the ratio of the number of edges to the number of possible edges.
 
@@ -118,8 +119,6 @@ def optimal_influence_default_values(
 
     Returns:
         dict: Default values for the parameters of the optimal_influence function.
-
-
     """
     rng: Generator = np.random.default_rng(seed=random_seed)
     NOISE_STRENGTH: float = 1
@@ -158,8 +157,14 @@ def optimal_influence_default_values(
     return game_params
 
 
-def simple_fit(parameter_space:list[ParameterGrid], target_matrix: np.ndarray, model: callable, model_kwargs:Optional[dict]= None, normalize:Union[bool, callable] = False) -> ParameterGrid:
-    """Simple (and honestly, ugly) fitting function to find the best parameters for a (communication) model. 
+def simple_fit(
+    parameter_space: list[ParameterGrid],
+    target_matrix: np.ndarray,
+    model: callable,
+    model_kwargs: Optional[dict] = None,
+    normalize: Union[bool, callable] = False,
+) -> ParameterGrid:
+    """Simple (and honestly, ugly) fitting function to find the best parameters for a (communication) model.
     Does a normal for-loop so it's not as efficient but at the moment, doesn't need to be either!
 
     Args:
@@ -172,23 +177,23 @@ def simple_fit(parameter_space:list[ParameterGrid], target_matrix: np.ndarray, m
     Returns:
         list: Updated copy of the parameter space with the correlation values.
     """
-    
-    model_kwargs:dict = model_kwargs if model_kwargs else {}
+
+    model_kwargs: dict = model_kwargs if model_kwargs else {}
     results = deepcopy(parameter_space)
     for parameter in tqdm(results, total=len(parameter_space), desc="C3PO noises: "):
-        
-        estimation:np.ndarray = model(**parameter, **model_kwargs)
-        
+        estimation: np.ndarray = model(**parameter, **model_kwargs)
+
         if normalize:
-            estimation:np.ndarray = normalize(estimation)
-        
-        r:float = _matrix_correlation(target_matrix, estimation)
+            estimation: np.ndarray = normalize(estimation)
+
+        r: float = _matrix_correlation(target_matrix, estimation)
         parameter.update({"correlation": r})
-    
+
     # TODO: This should be parallelized and sklearn compatible.
     return results
 
-def _matrix_correlation(one_matrix:np.ndarray, another_matrix:np.ndarray)->float:
+
+def _matrix_correlation(one_matrix: np.ndarray, another_matrix: np.ndarray) -> float:
     """Computes the Pearson's correlation between two matrices (not just the upper-triangle).
 
     Args:
@@ -197,7 +202,8 @@ def _matrix_correlation(one_matrix:np.ndarray, another_matrix:np.ndarray)->float
 
     Returns:
         float: Pearson's correlation between the two matrices.
-    """    
+    """
     return np.corrcoef(one_matrix.flatten(), another_matrix.flatten())[0, 1]
+
 
 # TODO: add a function to create example adjacency matrices for demonstration purposes.

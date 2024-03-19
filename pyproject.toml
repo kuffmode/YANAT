@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "yanat"
-version = "0.0.7"
+version = "0.0.8"
 description = "Yet Another Network Analysis Toolbox"
 authors = ["Kayson Fakhar, Shrey Dixit"]
 license = "MIT"
@@ -8,12 +8,14 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-msapy = "^1.6"
+msapy = "^1.7"
 numba = "^0.59.0"
 numpy = "^1.26.4"
 scipy = "^1.12.0"
 typeguard = "^2.13"
 requests = "2.29.0"
+scikit-learn = "^1.4.1.post1"
+myst-parser = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 sphinx = "^7.2.6"

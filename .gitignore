@@ -1,2 +1,9 @@
 docs/_build
 *__pycache__
+.venv/
+uv.lock
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+build/

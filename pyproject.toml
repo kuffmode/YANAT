@@ -3,7 +3,8 @@ name = "yanat"
 version = "0.1.0"
 description = "Yet Another Network Analysis Toolbox"
 authors = [
-    { name = "Kayson Fakhar, Shrey Dixit" }
+    { name = "Kayson Fakhar" },
+    { name = "Shrey Dixit" }
 ]
 license = { text = "MIT" }
 readme = "README.md"

@@ -947,6 +947,7 @@ def _compute_impact_for_edge(
 
 def compute_local_payoff_impact(
     coordinates: FloatArray,
+    wiring_distance_matrix: FloatArray,
     adjacency_matrix: FloatArray,
     distance_fn: DistanceMetric,
     alpha: float,
@@ -1049,6 +1050,7 @@ def find_optimal_alpha(
     coordinates: np.ndarray,
     empirical_connectivity: np.ndarray,
     distance_fn: Callable,
+    wiring_distance_matrix: np.ndarray,
     n_iterations: int = 10_000,
     beta: float = 1.0,
     alpha_range: tuple[float, float] = (1.0, 100.0),
@@ -1064,6 +1066,7 @@ def find_optimal_alpha(
     
     Args:
         coordinates: Node coordinates (n_nodes, n_dimensions)
+        wiring_distance_matrix: Precomputed wiring distance matrix (n_nodes, n_nodes)
         empirical_connectivity: Target connectivity matrix to match density with
         distance_fn: Distance metric function 
         n_iterations: Number of iterations for each simulation
@@ -1091,9 +1094,9 @@ def find_optimal_alpha(
     # Function to simulate network and get density
     def simulate_with_alpha(alpha_value):
         alpha_vec = np.full(n_iterations, alpha_value)
-        
         network = simulate_network_evolution(
             coordinates=coordinates,
+            wiring_distance_matrix=wiring_distance_matrix,
             n_iterations=n_iterations,
             distance_fn=distance_fn,
             alpha=alpha_vec,

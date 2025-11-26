@@ -14,6 +14,8 @@ from yanat.generative import (
     shortest_path_distance,
     topological_distance,
     compute_node_payoff,
+    simulate_network_evolution,
+    find_optimal_alpha,
 )
 
 
@@ -162,8 +164,8 @@ def test_propagation_distance():
 
 def test_resistance_distance():
     adjacency = np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
-    coordinates = np.array([[0, 0], [1, 0], [0, 1]])
-    result = resistance_distance(adjacency, coordinates)
+    # coordinates removed
+    result = resistance_distance(adjacency)
     assert result.shape == (3, 3)
     assert np.all(result >= 0)
 
@@ -196,23 +198,77 @@ def test_topological_distance():
 
 def test_compute_node_payoff():
     adjacency = np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
-    coordinates = np.array([[0, 0], [1, 0], [0, 1]])
-    distance_fn = shortest_path_distance
-
-    # Test without wiring_distance_matrix
-    result = compute_node_payoff(
-        0, adjacency, coordinates, distance_fn, 1.0, 1.0, 0.0, 1.0
-    )
-    assert isinstance(result, float)
-
-    # Test with wiring_distance_matrix
-    wiring_distance_matrix = np.array([
+    distance_matrix = np.array([
         [0.0, 1.0, 1.414],
         [1.0, 0.0, 1.0],
         [1.414, 1.0, 0.0]
     ])
-    result_with_matrix = compute_node_payoff(
-        0, adjacency, coordinates, distance_fn, 1.0, 1.0, 0.0, 1.0,
-        wiring_distance_matrix=wiring_distance_matrix
+    distance_fn = shortest_path_distance
+
+    # Test with distance_matrix
+    result = compute_node_payoff(
+        0, adjacency, distance_matrix, distance_fn, 1.0, 1.0, 0.0, 1.0
     )
-    assert isinstance(result_with_matrix, float)
+    assert isinstance(result, float)
+    
+    # Test with kwargs
+    result_kwargs = compute_node_payoff(
+        0, adjacency, distance_matrix, distance_fn, 1.0, 1.0, 0.0, 1.0,
+        distance_fn_kwargs={'dummy': 1}
+    )
+    assert isinstance(result_kwargs, float)
+
+
+def test_simulate_network_evolution():
+    n_nodes = 10
+    distance_matrix = np.random.rand(n_nodes, n_nodes)
+    distance_matrix = (distance_matrix + distance_matrix.T) / 2
+    np.fill_diagonal(distance_matrix, 0)
+    
+    history = simulate_network_evolution(
+        distance_matrix=distance_matrix,
+        n_iterations=10,
+        distance_fn=shortest_path_distance,
+        alpha=1.0,
+        beta=1.0,
+        noise=np.zeros(10),
+        connectivity_penalty=0.0,
+        n_jobs=1,
+        batch_size=2
+    )
+    
+    assert history.shape == (n_nodes, n_nodes, 10)
+    assert np.all(history >= 0)
+    assert np.all(history <= 1)
+
+
+def test_find_optimal_alpha():
+    n_nodes = 10
+    distance_matrix = np.random.rand(n_nodes, n_nodes)
+    distance_matrix = (distance_matrix + distance_matrix.T) / 2
+    np.fill_diagonal(distance_matrix, 0)
+    
+    # Create a dummy empirical connectivity
+    empirical_connectivity = np.random.randint(0, 2, (n_nodes, n_nodes))
+    empirical_connectivity = (empirical_connectivity + empirical_connectivity.T) // 2
+    np.fill_diagonal(empirical_connectivity, 0)
+    
+    result = find_optimal_alpha(
+        distance_matrix=distance_matrix,
+        empirical_connectivity=empirical_connectivity,
+        distance_fn=shortest_path_distance,
+        n_iterations=10,
+        beta=1.0,
+        alpha_range=(0.1, 2.0),
+        max_search_iterations=2,
+        n_jobs=1,
+        batch_size=2
+    )
+    
+    assert isinstance(result, dict)
+    assert 'alpha' in result
+    assert 'density' in result
+    assert 'evolution' in result
+    assert isinstance(result['alpha'], float)
+    assert isinstance(result['density'], float)
+    assert result['evolution'].shape == (n_nodes, n_nodes, 10)

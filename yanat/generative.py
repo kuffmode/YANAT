@@ -134,12 +134,21 @@ def validate_parameters(
                 f"{name} must be float or array, got {type(traj)}"
             )
 
-@njit
+
 def get_param_value(param: Trajectory, t: int) -> float:
-    """Get parameter value at time t efficiently."""
-    if isinstance(param, float):
-        return param
-    return param[t]
+    """
+    Get parameter value at time t efficiently.
+    
+    Args:
+        param: Parameter trajectory (float or array)
+        t: Time step
+        
+    Returns:
+        Parameter value at time t
+    """
+    if isinstance(param, np.ndarray):
+        return param[t]
+    return param
 
 def normalize_distances(
     coordinates: FloatArray,
@@ -228,8 +237,7 @@ def compute_component_sizes(adjacency: FloatArray) -> FloatArray:
             
     return sizes
 
-@jit_safe()
-def propagation_distance(adjacency_matrix, coordinates=None, alpha=0.8, eps=1e-10):
+def propagation_distance(adjacency_matrix, alpha=0.8, eps=1e-10, **kwargs):
     """
     Computes the propagation distance matrix using:
         -log((I - α*A)^{-1} * (I - α*A)^{-1}.T)
@@ -278,15 +286,13 @@ def propagation_distance(adjacency_matrix, coordinates=None, alpha=0.8, eps=1e-1
     # Compute distance
     return process_matrix(np.abs(-np.log(prop_matrix)))
 
-@jit_safe()
-def resistance_distance(adjacency: FloatArray, coordinates: FloatArray) -> FloatArray:
+def resistance_distance(adjacency: FloatArray, **kwargs) -> FloatArray:
     """
-    Compute resistance distances between all pairs of nodes.
+    Compute resistance distances between all pairs of nodes using the binary graph.
     
     Args:
         adjacency: Binary adjacency matrix (n_nodes, n_nodes)
-        coordinates: Node coordinates (n_nodes, n_dimensions)
-            Note: coordinates are used only for weighting edges
+        **kwargs: Additional arguments (ignored)
             
     Returns:
         Matrix of resistance distances (n_nodes, n_nodes)
@@ -294,18 +300,17 @@ def resistance_distance(adjacency: FloatArray, coordinates: FloatArray) -> Float
     n_nodes = len(adjacency)
     distances = np.zeros((n_nodes, n_nodes))
     
-    # Compute weight matrix (1/euclidean_distance for connected nodes)
-    for i in range(n_nodes):
-        for j in range(i+1, n_nodes):
-            if adjacency[i, j]:
-                dist = np.sqrt(np.sum((coordinates[i] - coordinates[j])**2))
-                weight = 1.0 / (dist + 1e-12)  # Avoid division by zero
-                distances[i, j] = weight
-                distances[j, i] = weight
+    # Use binary weights (1.0 for connected nodes)
+    # We can just use the adjacency matrix directly as the weight matrix for connected edges
+    # But we need to ensure it's symmetric and float
+    weights = adjacency.astype(np.float64)
+    # Ensure symmetry if not already
+    weights = (weights + weights.T) / 2.0
+    weights[weights > 0] = 1.0
                 
-    # Compute weighted Laplacian
-    diag = np.sum(distances, axis=1)
-    laplacian = np.diag(diag) - distances
+    # Compute weighted Laplacian (which is just the normal Laplacian for binary graph)
+    diag = np.sum(weights, axis=1)
+    laplacian = np.diag(diag) - weights
     
     # Compute pseudoinverse using eigendecomposition
     eigvals, eigvecs = np.linalg.eigh(laplacian)
@@ -325,8 +330,7 @@ def resistance_distance(adjacency: FloatArray, coordinates: FloatArray) -> Float
             
     return resistance
 
-@jit_safe()
-def heat_kernel_distance(adjacency_matrix, coordinates=None, t=0.5, eps=1e-10,normalize=False):
+def heat_kernel_distance(adjacency_matrix, t=0.5, eps=1e-10, normalize=False, **kwargs):
     """
     Computes the heat kernel distance matrix at diffusion time t.
     
@@ -334,8 +338,6 @@ def heat_kernel_distance(adjacency_matrix, coordinates=None, t=0.5, eps=1e-10,no
     ----------
     adjacency_matrix : np.ndarray
         A square adjacency matrix.
-    coordinates : np.ndarray, optional
-        Not used in computation, kept for signature consistency.
     t : float, optional
         Diffusion time parameter controlling the balance between local and 
         global structure (default: 1.0).
@@ -343,6 +345,10 @@ def heat_kernel_distance(adjacency_matrix, coordinates=None, t=0.5, eps=1e-10,no
         - Large t values focus on global structure (approaching resistance distance)
     eps : float, optional
         Small constant to ensure numerical stability (default: 1e-10).
+    normalize : bool, optional
+        Whether to normalize the distance matrix.
+    **kwargs : dict
+        Additional arguments (ignored).
     
     Returns
     -------
@@ -409,8 +415,7 @@ def heat_kernel_distance(adjacency_matrix, coordinates=None, t=0.5, eps=1e-10,no
     else:
         return dist_matrix
 
-@jit_safe()
-def shortest_path_distance(adjacency_matrix,coordinates = None):
+def shortest_path_distance(adjacency_matrix, **kwargs):
     """
     Computes shortest-path distances between all pairs of nodes
     using the Floyd-Warshall algorithm.
@@ -420,6 +425,8 @@ def shortest_path_distance(adjacency_matrix,coordinates = None):
     adjacency_matrix : np.ndarray
         A square adjacency matrix where entry (i, j) represents
         the weight of the edge from node i to j. Use np.inf for no direct edge.
+    **kwargs : dict
+        Additional arguments (ignored).
 
     Returns
     -------
@@ -454,8 +461,7 @@ def shortest_path_distance(adjacency_matrix,coordinates = None):
 
     return dist_matrix
 
-@jit_safe()
-def search_information(W, coordinates = None, symmetric=False):
+def search_information(W, symmetric=False, **kwargs):
     """
     Calculate search information for a memoryless random walker.
 
@@ -463,10 +469,10 @@ def search_information(W, coordinates = None, symmetric=False):
     ----------
     W : (N, N) ndarray
         Weighted/unweighted, directed/undirected connection weight matrix (non-negative).
-    coordinates : (N, d) ndarray
-        (Unused) kept for API consistency.
     symmetric : bool
         If True, returns a symmetric matrix using min(SI_ij, SI_ji).
+    **kwargs : dict
+        Additional arguments (ignored).
 
     Returns
     -------
@@ -478,8 +484,6 @@ def search_information(W, coordinates = None, symmetric=False):
     normalized (rows summing to zero or numerical issues causing products > 1); this
     implementation uses stable log accumulation and guards zero-strength rows.
     """
-    # Explicitly acknowledge unused parameter to silence linters/compilers
-    _unused_coordinates = coordinates
 
     N = W.shape[0]
 
@@ -557,13 +561,13 @@ def search_information(W, coordinates = None, symmetric=False):
         return result
     return SI
 
-@jit_safe()
-def topological_distance(adj_matrix, coordinates = None):
+def topological_distance(adj_matrix, **kwargs):
     """
     Compute pairwise cosine similarity between nodes based on their edge patterns.
     
     Args:
         adj_matrix (np.ndarray): Binary adjacency matrix (N x N)
+        **kwargs: Additional arguments (ignored)
         
     Returns:
         np.ndarray: Matching index matrix (N x N)
@@ -593,14 +597,15 @@ def topological_distance(adj_matrix, coordinates = None):
             
     return 1-matching_matrix
 
-@jit_safe()
-def matching_distance(adj_matrix,coordinates = None):
+
+def matching_distance(adj_matrix, **kwargs):
     """
     Compute pairwise matching index between nodes.
     Matching index = 2 * (shared connections) / (total unshared connections)
     
     Args:
         adj_matrix (np.ndarray): Binary adjacency matrix (N x N)
+        **kwargs: Additional arguments (ignored)
         
     Returns:
         np.ndarray: Matching index matrix (N x N)
@@ -633,17 +638,16 @@ def matching_distance(adj_matrix,coordinates = None):
             
     return 1-matching_matrix
     
-@jit_safe()
 def compute_node_payoff(
     node: int,
     adjacency: FloatArray,
-    coordinates: FloatArray,
-    distance_fn: Callable[[FloatArray, FloatArray], FloatArray],
+    distance_matrix: FloatArray,
+    distance_fn: Callable[..., FloatArray],
     alpha: float,
     beta: float,
     noise: float,
     connectivity_penalty: float,
-    wiring_distance_matrix: Optional[FloatArray] = None,
+    distance_fn_kwargs: Optional[Dict[str, Any]] = None,
 ) -> float:
     """
     Compute payoff for a single node.
@@ -651,35 +655,32 @@ def compute_node_payoff(
     Args:
         node: Index of node
         adjacency: Current adjacency matrix
-        coordinates: Node coordinates
+        distance_matrix: Pre-computed distance matrix (n_nodes, n_nodes) for wiring cost
         distance_fn: Function computing distance metric
         alpha: Weight of distance term
         beta: Weight of wiring cost
         noise: Noise value (0 for deterministic)
         connectivity_penalty: Penalty for disconnected components
-        wiring_distance_matrix: Pre-computed wiring distance matrix (optional)
-            If provided, this will be used instead of computing distances from coordinates
+        distance_fn_kwargs: Kwargs for distance_fn
             
     Returns:
         Total payoff value
     """
+    if distance_fn_kwargs is None:
+        distance_fn_kwargs = {}
+        
     n_nodes = len(adjacency)
     payoff = 0.0
     
     # Distance term
     if alpha != 0:
-        distances = distance_fn(adjacency, coordinates)
+        distances = distance_fn(adjacency, **distance_fn_kwargs)
         payoff -= alpha * np.sum(distances.T[node])
         
     # Wiring cost
     if beta != 0:
-        if wiring_distance_matrix is not None:
-            # Use pre-computed wiring distance matrix
-            euclidean = wiring_distance_matrix[node]
-        else:
-            # Compute euclidean distances from coordinates
-            euclidean = np.sqrt(np.sum((coordinates[node] - coordinates)**2, axis=1))
-            
+        # Use pre-computed wiring distance matrix
+        euclidean = distance_matrix[node]
         payoff -= beta * np.sum(adjacency[node] * euclidean)
         
     # Connectivity penalty
@@ -697,7 +698,7 @@ def compute_node_payoff(
 def sample_nodes_with_centers(
     n_nodes: int,
     centers: FloatArray,
-    coordinates: FloatArray,
+    distance_matrix: FloatArray,
     width: float,
     t: int
 ) -> tuple[int, int]:
@@ -707,7 +708,7 @@ def sample_nodes_with_centers(
     Args:
         n_nodes: Number of nodes in network
         centers: Center nodes for sampling (n_centers, n_iterations) or (1, n_iterations)
-        coordinates: Node coordinates (n_nodes, n_dimensions)
+        distance_matrix: Pre-computed distance matrix (n_nodes, n_nodes)
         width: Width of gaussian distribution
         t: Current iteration
         
@@ -722,9 +723,8 @@ def sample_nodes_with_centers(
     center_idx = np.random.randint(0, n_centers)
     center = int(current_centers[center_idx])
     
-    # Compute distances from center to all nodes
-    center_coords = coordinates[center]
-    distances = np.sqrt(np.sum((coordinates - center_coords)**2, axis=1))
+    # Get distances from center to all nodes
+    distances = distance_matrix[center]
     
     # Compute gaussian probabilities
     probs = np.exp(-distances**2 / (2 * width**2))
@@ -737,7 +737,7 @@ def sample_nodes_with_centers(
     return i, j
 
 def simulate_network_evolution(
-    coordinates: FloatArray,
+    distance_matrix: FloatArray,
     n_iterations: int,
     distance_fn: DistanceMetric,
     alpha: Trajectory,
@@ -750,14 +750,14 @@ def simulate_network_evolution(
     sampling_centers: Optional[FloatArray] = None,
     sampling_width: Optional[float] = None,
     random_seed: Optional[int] = None,
-    wiring_distance_matrix: Optional[FloatArray] = None,
-    symmetric: Optional[bool] = True
+    symmetric: Optional[bool] = True,
+    **kwargs
 ) -> FloatArray:
     """
     Simulate network evolution through payoff optimization.
     
     Args:
-        coordinates: Node coordinates (n_nodes, n_dimensions)
+        distance_matrix: Pre-computed distance matrix (n_nodes, n_nodes)
         n_iterations: Number of simulation steps
         distance_fn: Function computing distance metric
         alpha: Weight of distance term (float or array)
@@ -770,9 +770,9 @@ def simulate_network_evolution(
         sampling_centers: Centers for node sampling (optional)
         sampling_width: Width for sampling distribution (optional)
         random_seed: Random seed for reproducibility
-        wiring_distance_matrix: Pre-computed wiring distance matrix (optional)
-            If provided, this will be used instead of computing distances from coordinates
         symmetric: if True (default) it enforces connectivity to the otherside if a connection is accepted by one side.
+        **kwargs: Additional arguments passed to internal functions
+            - distance_fn_kwargs: Dict of kwargs for distance_fn
         
     Returns:
         History of adjacency matrices (n_nodes, n_nodes, n_iterations)
@@ -796,11 +796,13 @@ def simulate_network_evolution(
                 f"sampling_centers length {sampling_centers.shape[1]} doesn't match "
                 f"simulation length {n_iterations}"
             )
+            
+    distance_fn_kwargs = kwargs.get('distance_fn_kwargs', {})
     
     if random_seed is not None:
         np.random.seed(random_seed)
         
-    n_nodes = len(coordinates)
+    n_nodes = len(distance_matrix)
     
     # Initialize adjacency if not provided
     if initial_adjacency is None:
@@ -832,7 +834,7 @@ def simulate_network_evolution(
             def process_flip(_):
                 if sampling_centers is not None:
                     i, j = sample_nodes_with_centers(
-                        n_nodes, sampling_centers, coordinates, sampling_width, t
+                        n_nodes, sampling_centers, distance_matrix, sampling_width, t
                     )
                 else:
                     i, j = np.random.randint(0, n_nodes, size=2)
@@ -841,9 +843,9 @@ def simulate_network_evolution(
                     
                 # Compute current payoff
                 current = compute_node_payoff(
-                    i, adjacency, coordinates, distance_fn,
+                    i, adjacency, distance_matrix, distance_fn,
                     alpha_t, beta_t, noise_t, penalty_t,
-                    wiring_distance_matrix,
+                    distance_fn_kwargs
                 )
                 
                 # Test flip
@@ -853,9 +855,9 @@ def simulate_network_evolution(
                 
                 # Compute new payoff
                 new = compute_node_payoff(
-                    i, adj_test, coordinates, distance_fn,
+                    i, adj_test, distance_matrix, distance_fn,
                     alpha_t, beta_t, noise_t, penalty_t,
-                    wiring_distance_matrix,
+                    distance_fn_kwargs
                 )
                 
                 return {
@@ -886,11 +888,10 @@ def _compute_impact_for_edge(
     i: int,
     j: int,
     original_adjacency: FloatArray,
-    coordinates: FloatArray,
+    distance_matrix: FloatArray,
     distance_fn: DistanceMetric,
     alpha: float,
     beta: float,
-    wiring_distance_matrix: FloatArray,
     original_payoffs: FloatArray,
     distance_fn_kwargs: Dict[str, Any]
 ) -> tuple[int, int, float, float]:
@@ -911,27 +912,25 @@ def _compute_impact_for_edge(
     new_payoff_i = compute_node_payoff(
         node=i,
         adjacency=adj_lesioned,
-        coordinates=coordinates,
+        distance_matrix=distance_matrix,
         distance_fn=distance_fn,
         alpha=alpha,
         beta=beta,
         noise=0.0,                # Noise is set to 0 for this analysis
         connectivity_penalty=0.0, # Penalty is set to 0 for this analysis
-        wiring_distance_matrix=wiring_distance_matrix, # Pass precomputed Euclidean distances
-        **distance_fn_kwargs      # Pass any extra arguments for the distance function
+        distance_fn_kwargs=distance_fn_kwargs      # Pass any extra arguments for the distance function
     )
 
     new_payoff_j = compute_node_payoff(
         node=j,
         adjacency=adj_lesioned,
-        coordinates=coordinates,
+        distance_matrix=distance_matrix,
         distance_fn=distance_fn,
         alpha=alpha,
         beta=beta,
         noise=0.0,
         connectivity_penalty=0.0,
-        wiring_distance_matrix=wiring_distance_matrix,
-        **distance_fn_kwargs
+        distance_fn_kwargs=distance_fn_kwargs
     )
 
     # 3. Compute differences from the pre-calculated original payoffs
@@ -946,8 +945,7 @@ def _compute_impact_for_edge(
     return i, j, diff_i, diff_j
 
 def compute_local_payoff_impact(
-    coordinates: FloatArray,
-    wiring_distance_matrix: FloatArray,
+    distance_matrix: FloatArray,
     adjacency_matrix: FloatArray,
     distance_fn: DistanceMetric,
     alpha: float,
@@ -966,12 +964,11 @@ def compute_local_payoff_impact(
     Uses parallel processing to speed up the computation for multiple edges.
 
     Args:
-        coordinates: Node coordinates array (n_nodes, n_dimensions).
+        distance_matrix: Pre-computed distance matrix (n_nodes, n_nodes).
         adjacency_matrix: The binary, symmetric adjacency matrix (n_nodes, n_nodes).
                           Assumes 1 for connection, 0 otherwise.
         distance_fn: Function that computes the 'communication' distance metric used in payoff.
-                     Expected signature: distance_fn(adj, coords, **kwargs) -> distance_matrix
-                     or distance_fn(adj, **kwargs) -> distance_matrix.
+                     Expected signature: distance_fn(adj, **kwargs) -> distance_matrix.
         alpha: Weight parameter for the distance term in the payoff function.
         beta: Weight parameter for the wiring cost term (Euclidean distance)
               in the payoff function (default: 1.0).
@@ -991,9 +988,6 @@ def compute_local_payoff_impact(
     if distance_fn_kwargs is None:
         distance_fn_kwargs = {}
 
-    # --- 1. Pre-computation Steps ---
-    wiring_distance_matrix = squareform(pdist(coordinates.astype(np.float64), metric='euclidean'))
-
     # Calculate the initial payoff for all nodes using the original network
     original_payoffs = np.zeros(n_nodes)
     # This loop calculates the baseline payoff before any edges are removed
@@ -1002,14 +996,13 @@ def compute_local_payoff_impact(
          original_payoffs[node_idx] = compute_node_payoff(
             node=node_idx,
             adjacency=adjacency_matrix, # Use the original adjacency matrix
-            coordinates=coordinates,
+            distance_matrix=distance_matrix,
             distance_fn=distance_fn,
             alpha=alpha,
             beta=beta,
             noise=0.0,                # Analysis assumes no noise
             connectivity_penalty=0.0, # Analysis assumes no connectivity penalty
-            wiring_distance_matrix=wiring_distance_matrix, # Pass precomputed wiring cost distances
-            **distance_fn_kwargs      # Pass extra args to distance function if any
+            distance_fn_kwargs=distance_fn_kwargs      # Pass extra args to distance function if any
         )
 
     # --- 2. Parallel Edge Lesioning ---
@@ -1025,11 +1018,10 @@ def compute_local_payoff_impact(
         delayed(_compute_impact_for_edge)(
             i, j, # Pass the indices of the edge
             original_adjacency=adjacency_matrix,
-            coordinates=coordinates,
+            distance_matrix=distance_matrix,
             distance_fn=distance_fn,
             alpha=alpha,
             beta=beta,
-            wiring_distance_matrix=wiring_distance_matrix,
             original_payoffs=original_payoffs, # Pass the precomputed original payoffs
             distance_fn_kwargs=distance_fn_kwargs
         ) for i, j in edge_indices # Iterate directly over the found edge indices
@@ -1047,10 +1039,9 @@ def compute_local_payoff_impact(
     return payoff_impact_matrix
 
 def find_optimal_alpha(
-    coordinates: np.ndarray,
+    distance_matrix: np.ndarray,
     empirical_connectivity: np.ndarray,
     distance_fn: Callable,
-    wiring_distance_matrix: np.ndarray,
     n_iterations: int = 10_000,
     beta: float = 1.0,
     alpha_range: tuple[float, float] = (1.0, 100.0),
@@ -1059,14 +1050,15 @@ def find_optimal_alpha(
     random_seed: int = 11,
     batch_size: int = 16,
     symmetric: bool = True,
-) -> tuple[float, float, np.ndarray]:
+    n_jobs: int = -1,
+    **kwargs
+) -> Dict[str, Any]:
     """
     Find the optimal alpha value that produces a network with density closest to empirical.
     It uses a bisection search with linear interpolation.
     
     Args:
-        coordinates: Node coordinates (n_nodes, n_dimensions)
-        wiring_distance_matrix: Precomputed wiring distance matrix (n_nodes, n_nodes)
+        distance_matrix: Precomputed distance matrix (n_nodes, n_nodes)
         empirical_connectivity: Target connectivity matrix to match density with
         distance_fn: Distance metric function 
         n_iterations: Number of iterations for each simulation
@@ -1077,9 +1069,14 @@ def find_optimal_alpha(
         random_seed: Random seed for reproducibility
         batch_size: Batch size for parallel processing
         symmetric: ensures symmetry.
+        n_jobs: Number of parallel jobs
+        **kwargs: Additional arguments passed to simulate_network_evolution
         
     Returns:
-        Tuple of (optimal_alpha, achieved_density, final_adjacency_matrix)
+        Dictionary containing:
+            - 'alpha': Optimal alpha value
+            - 'density': Density of the resulting network
+            - 'evolution': Full history of adjacency matrices (n_nodes, n_nodes, n_iterations)
     """
     # Calculate empirical density
     n_nodes = empirical_connectivity.shape[0]
@@ -1095,42 +1092,46 @@ def find_optimal_alpha(
     def simulate_with_alpha(alpha_value):
         alpha_vec = np.full(n_iterations, alpha_value)
         network = simulate_network_evolution(
-            coordinates=coordinates,
-            wiring_distance_matrix=wiring_distance_matrix,
+            distance_matrix=distance_matrix,
             n_iterations=n_iterations,
             distance_fn=distance_fn,
             alpha=alpha_vec,
             beta=beta_vec,
             noise=noise_vec,
             connectivity_penalty=penalty_vec,
-            n_jobs=-1,
+            n_jobs=n_jobs,
             random_seed=random_seed,
             batch_size=batch_size_vec,
-            symmetric=symmetric
+            symmetric=symmetric,
+            **kwargs
         )
         
         # Get final network
         final_adj = network[:, :, -1]
         density = np.sum(final_adj) / (n_nodes * (n_nodes - 1))
         
-        return density, final_adj
+        return density, network
     
     # Initialize search with provided range
     alpha_min, alpha_max = alpha_range
-    min_density, min_adj = simulate_with_alpha(alpha_min)
-    max_density, max_adj = simulate_with_alpha(alpha_max)
+    min_density, min_net = simulate_with_alpha(alpha_min)
+    max_density, max_net = simulate_with_alpha(alpha_max)
     
     print(f"Initial range: alpha=[{alpha_min}, {alpha_max}], density=[{min_density}, {max_density}]")
     print(f"Target density: {empirical_density}")
     
     # Track all tested points
-    tested_points = [(alpha_min, min_density, min_adj), (alpha_max, max_density, max_adj)]
+    tested_points = [
+        {'alpha': alpha_min, 'density': min_density, 'evolution': min_net},
+        {'alpha': alpha_max, 'density': max_density, 'evolution': max_net}
+    ]
     
     # Check if range brackets the target
     if (min_density > empirical_density and max_density > empirical_density) or \
        (min_density < empirical_density and max_density < empirical_density):
         print("Warning: Initial range does not bracket the target density!")
-        return min(tested_points, key=lambda p: abs(p[1] - empirical_density))
+        # Return best of the two
+        return min(tested_points, key=lambda p: abs(p['density'] - empirical_density))
     
     # Bisection search with linear interpolation
     iterations = 0
@@ -1144,31 +1145,27 @@ def find_optimal_alpha(
             alpha_mid = (alpha_min + alpha_max) / 2
         
         print(f"Iteration {iterations+1}: Testing alpha={alpha_mid}")
-        mid_density, mid_adj = simulate_with_alpha(alpha_mid)
-        tested_points.append((alpha_mid, mid_density, mid_adj))
+        mid_density, mid_net = simulate_with_alpha(alpha_mid)
+        tested_points.append({'alpha': alpha_mid, 'density': mid_density, 'evolution': mid_net})
         print(f"Alpha={alpha_mid} → density={mid_density}, diff from target={mid_density-empirical_density}")
         
         # Check if we're close enough
         if abs(mid_density - empirical_density) < tolerance:
-            return alpha_mid, mid_density, mid_adj
+            return {'alpha': alpha_mid, 'density': mid_density, 'evolution': mid_net}
         
         # Update range
         if mid_density < empirical_density:
             alpha_min = alpha_mid
             min_density = mid_density
-            min_adj = mid_adj
         else:
             alpha_max = alpha_mid
             max_density = mid_density
-            max_adj = mid_adj
         
         # Check if range is small enough
         if alpha_max - alpha_min < tolerance:
-            best_point = min(tested_points, key=lambda p: abs(p[1] - empirical_density))
-            return best_point
+            return min(tested_points, key=lambda p: abs(p['density'] - empirical_density))
         
         iterations += 1
     
     # If we reach max iterations, return best point found
-    best_point = min(tested_points, key=lambda p: abs(p[1] - empirical_density))
-    return best_point
+    return min(tested_points, key=lambda p: abs(p['density'] - empirical_density))

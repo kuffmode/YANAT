@@ -212,4 +212,3 @@ def calculate_endpoint_similarity(synthetic_matrix, empirical_matrix):
         similarities[i] = cosine_similarity(synthetic_matrix[i].reshape(1, -1),
                                             empirical_matrix[i].reshape(1, -1))
     return similarities
-# TODO: add a function to create example adjacency matrices for demonstration purposes.

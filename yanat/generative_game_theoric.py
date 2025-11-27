@@ -315,92 +315,6 @@ def shortest_path_distance(adjacency_matrix: FloatArray, **kwargs) -> FloatArray
     
     return dist_matrix
 
-def search_information(W, symmetric=False, **kwargs):
-    """
-    Calculate search information for a memoryless random walker.
-    
-    Args:
-        W (np.ndarray): Adjacency matrix (N x N)
-        symmetric (bool): If True, symmetrize W.
-        **kwargs: Additional arguments.
-        
-    Returns
-    -------
-    SI : (N, N) ndarray
-        Pairwise search information matrix (>=0); diagonal = 0; unreachable pairs = inf.
-    """
-    from scipy.sparse.csgraph import shortest_path
-
-    # Apply weighting if weight_coefficient is present
-    W = _apply_weighting(W, **kwargs)
-    
-    N = W.shape[0]
-
-    # Safe row-normalization to transition probabilities
-    T = np.zeros((N, N), dtype=np.float64)
-    row_sums = np.sum(W, axis=1)
-    for i in range(N):
-        if row_sums[i] > 0:
-            T[i, :] = W[i, :] / row_sums[i]
-        # If row sum is zero, leave zeros (no outgoing probability)
-
-    # Compute shortest paths on binary graph (hop count)
-    # Treat existing edges as length 1
-    binary_adj = (W > 0).astype(np.float64)
-    
-    dist_matrix, predecessors = shortest_path(
-        binary_adj, 
-        method='auto', 
-        directed=True, 
-        return_predecessors=True,
-        unweighted=True # Use unweighted to get hop counts
-    )
-
-    # Compute search information using log-sum for numerical stability
-    SI = np.full((N, N), np.inf, dtype=np.float64)
-    np.fill_diagonal(SI, 0.0)
-    
-    # Pre-calculate log probabilities
-    with np.errstate(divide='ignore'):
-        log_T = -np.log2(T)
-    # Replace inf with large number or handle carefully?
-    # If T=0, log_T=inf. Correct.
-    
-    for i in range(N):
-        for j in range(N):
-            if i == j:
-                continue
-            if dist_matrix[i, j] == np.inf:
-                continue
-
-            current = j
-            prob_sum = 0.0
-            valid = True
-            
-            # Backtrack from j to i
-            while current != i:
-                pred = predecessors[i, current]
-                if pred == -9999: # No path, should not happen if dist != inf
-                    valid = False
-                    break
-                
-                # Edge pred -> current
-                weight = log_T[pred, current]
-                if weight == np.inf:
-                    valid = False
-                    break
-                prob_sum += weight
-                current = pred
-            
-            if valid:
-                SI[i, j] = prob_sum
-
-    if symmetric:
-        # Symmetrize by taking min(SI[i,j], SI[j,i])
-        SI = np.minimum(SI, SI.T)
-        
-    return SI
-
 def topological_distance(adj_matrix: FloatArray, **kwargs) -> FloatArray:
     """
     Computes pairwise topological distance based on cosine similarity of neighbors.
@@ -487,7 +401,7 @@ def compute_node_payoff(
         # Note: Some metrics might use distance_matrix for weighting
         distances = distance_fn(adjacency, distance_matrix=distance_matrix, **distance_fn_kwargs)
         # Sum of distances from this node to all other nodes
-        payoff -= alpha * np.sum(distances.T[node])
+        payoff -= alpha * np.sum(distances[node])
         
     # 2. Wiring Cost Term
     if beta != 0:

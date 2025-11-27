@@ -1,11 +1,12 @@
-# Yet Another Network Analysis Toolkit.
+<img src="yanat.png" alt="drawing" width="400"/>
+
 At the moment, this bad boy containts a few network communication metrics and models at its `core` and a game-theoretical network generation framework at `generative_game_theoric`. I'll just add more stuff as I go.
 
 ## Installation
 Guess what, `pip install yanat` is all you need.
 
 ## Example
-See the `examples` folder for more examples.
+See the `examples` folder for an example related to Game theoretic network generation.
 
 ### Computing the Optimal Influence (OI) state of a given network: Step by step.
 So, not to kill the vibe here but `yanat` was firstly designed to make computing (OI) states of networks a breeze. It then grew to include other communication models. Then it grew a bit more to include some network analysis tools. I don't know how far it keeps growing but the trickiest thing is to compute OI. The rest is really just calling one function and getting the result. 

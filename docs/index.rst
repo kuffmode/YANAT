@@ -14,6 +14,7 @@ Welcome to YANAT's documentation!
    :caption: Contents:
 
    modules
+   examples
 
 .. Indices and tables
 .. ==================

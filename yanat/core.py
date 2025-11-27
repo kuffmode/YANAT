@@ -78,7 +78,7 @@ def simulate_dynamical_system(
 
     Args:
         adjacency_matrix (np.ndarray): The adjacency matrix (N,N) make sure the matrix is normalized so the system remain stable.
-        we can use `ut.spectral_normalization(1,A)` to normalize the matrix A.
+            we can use ``ut.spectral_normalization(1,A)`` to normalize the matrix A.
         input_matrix (np.ndarray): Input of shape (N, T) where N is the number of nodes and T is the number of time steps.
         coupling (float, optional): The coupling strength between each node (scales the adjacency_matrix). Defaults to 1.
         This is another thing to take care of. If the system is unstable, try to reduce the coupling, like to 0.9.

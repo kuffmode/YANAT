@@ -1,6 +1,6 @@
 [project]
 name = "yanat"
-version = "0.1.1"
+version = "0.1.2"
 description = "Yet Another Network Analysis Toolbox"
 authors = [
     { name = "Kayson Fakhar" },
@@ -37,6 +37,8 @@ dev = [
     "sphinx>=8.2.3",
     "sphinx-rtd-theme>=3.0.2",
     "pytest>=8.4.2",
+    "nbsphinx>=0.9.3",
+    "ipykernel>=6.29.0",
 ]
 
 examples = [

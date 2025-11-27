@@ -1,22 +1,20 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yanat.utils &mdash; YANAT 0.0.9 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+  <title>yanat.utils &mdash; YANAT 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=f7cdbf68"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -71,21 +69,22 @@
            <div itemprop="articleBody">
              
   <h1>Source code for yanat.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">_pickle</span> <span class="k">as</span> <span class="nn">pk</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">ParameterGrid</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">_pickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pk</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterGrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics.pairwise</span><span class="w"> </span><span class="kn">import</span> <span class="n">cosine_similarity</span>
 
 
 <div class="viewcode-block" id="find_density">
 <a class="viewcode-back" href="../../yanat.html#yanat.utils.find_density">[docs]</a>
-<span class="k">def</span> <span class="nf">find_density</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_density</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds the density of the given adjacency matrix. It&#39;s the ratio of the number of edges to the number of possible edges.</span>
 
 <span class="sd">    Args:</span>
@@ -100,7 +99,7 @@
 
 <div class="viewcode-block" id="minmax_normalize">
 <a class="viewcode-back" href="../../yanat.html#yanat.utils.minmax_normalize">[docs]</a>
-<span class="k">def</span> <span class="nf">minmax_normalize</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">minmax_normalize</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalizes data between 0 and 1.</span>
@@ -117,7 +116,7 @@
 
 <div class="viewcode-block" id="log_normalize">
 <a class="viewcode-back" href="../../yanat.html#yanat.utils.log_normalize">[docs]</a>
-<span class="k">def</span> <span class="nf">log_normalize</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_normalize</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the logarithm of the data (adjacency_matrix) but also takes care of the infinit values.</span>
 
 <span class="sd">    Args:</span>
@@ -132,7 +131,7 @@
 
 <div class="viewcode-block" id="log_minmax_normalize">
 <a class="viewcode-back" href="../../yanat.html#yanat.utils.log_minmax_normalize">[docs]</a>
-<span class="k">def</span> <span class="nf">log_minmax_normalize</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_minmax_normalize</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;It first takes the logarithm of the data and then normalizes it between 0 and 1. It also takes care of the infinit values and those nasty things.</span>
 
 <span class="sd">    Args:</span>
@@ -149,7 +148,7 @@
 
 <div class="viewcode-block" id="spectral_normalization">
 <a class="viewcode-back" href="../../yanat.html#yanat.utils.spectral_normalization">[docs]</a>
-<span class="k">def</span> <span class="nf">spectral_normalization</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">spectral_normalization</span><span class="p">(</span>
     <span class="n">target_radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalizes the adjacency matrix to have a spectral radius of the target_radius. Good to keep the system stable.</span>
@@ -168,7 +167,7 @@
 
 <div class="viewcode-block" id="strength_normalization">
 <a class="viewcode-back" href="../../yanat.html#yanat.utils.strength_normalization">[docs]</a>
-<span class="k">def</span> <span class="nf">strength_normalization</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">strength_normalization</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Normalizes the adjacency matrix to subside the effect of high-strength (or high-degree) nodes.</span>
 <span class="sd">    This function implements the strength normalization algorithm described in [1].</span>
@@ -197,7 +196,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">optimal_influence_default_values</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">optimal_influence_default_values</span><span class="p">(</span>
     <span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">location</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;adjacency_matrices_for_oi&quot;</span><span class="p">,</span>
     <span class="n">random_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">11</span><span class="p">,</span>
@@ -253,7 +252,7 @@
 
 <div class="viewcode-block" id="simple_fit">
 <a class="viewcode-back" href="../../yanat.html#yanat.utils.simple_fit">[docs]</a>
-<span class="k">def</span> <span class="nf">simple_fit</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">simple_fit</span><span class="p">(</span>
     <span class="n">parameter_space</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ParameterGrid</span><span class="p">],</span>
     <span class="n">target_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">model</span><span class="p">:</span> <span class="nb">callable</span><span class="p">,</span>
@@ -290,7 +289,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">_matrix_correlation</span><span class="p">(</span><span class="n">one_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">another_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_matrix_correlation</span><span class="p">(</span><span class="n">one_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">another_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the Pearson&#39;s correlation between two matrices (not just the upper-triangle).</span>
 
 <span class="sd">    Args:</span>
@@ -302,8 +301,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">one_matrix</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">another_matrix</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
+<div class="viewcode-block" id="calculate_endpoint_similarity">
+<a class="viewcode-back" href="../../yanat.html#yanat.utils.calculate_endpoint_similarity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_endpoint_similarity</span><span class="p">(</span><span class="n">synthetic_matrix</span><span class="p">,</span> <span class="n">empirical_matrix</span><span class="p">):</span>
+    <span class="n">similarities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">synthetic_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">synthetic_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">similarities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">synthetic_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                                            <span class="n">empirical_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">similarities</span></div>
 
-<span class="c1"># TODO: add a function to create example adjacency matrices for demonstration purposes.</span>
 </pre></div>
 
            </div>

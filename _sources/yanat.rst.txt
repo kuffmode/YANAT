@@ -15,3 +15,11 @@ yanat.utils
    :undoc-members:
    :show-inheritance:
 
+yanat.generative\_game\_theoric
+--------------------------------------
+
+.. automodule:: yanat.generative_game_theoric
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

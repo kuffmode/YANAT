@@ -6,19 +6,21 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yanat.core &mdash; YANAT 0.1.0 documentation</title>
+  <title>yanat.core &mdash; YANAT 0.1.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/documentation_options.js?v=360bc84d"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
     <link rel="prev" title="YANAT" href="modules.html" /> 
 </head>
 
@@ -68,8 +70,24 @@
 <li class="toctree-l3"><a class="reference internal" href="#yanat.utils.strength_normalization"><code class="docutils literal notranslate"><span class="pre">strength_normalization()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#module-yanat.generative_game_theoric">yanat.generative_game_theoric</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.compute_component_sizes"><code class="docutils literal notranslate"><span class="pre">compute_component_sizes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.compute_local_payoff_impact"><code class="docutils literal notranslate"><span class="pre">compute_local_payoff_impact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.compute_node_payoff"><code class="docutils literal notranslate"><span class="pre">compute_node_payoff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.find_optimal_alpha"><code class="docutils literal notranslate"><span class="pre">find_optimal_alpha()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.get_param_value"><code class="docutils literal notranslate"><span class="pre">get_param_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.heat_kernel_distance"><code class="docutils literal notranslate"><span class="pre">heat_kernel_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.propagation_distance"><code class="docutils literal notranslate"><span class="pre">propagation_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.resistance_distance"><code class="docutils literal notranslate"><span class="pre">resistance_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.shortest_path_distance"><code class="docutils literal notranslate"><span class="pre">shortest_path_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.simulate_network_evolution"><code class="docutils literal notranslate"><span class="pre">simulate_network_evolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.topological_distance"><code class="docutils literal notranslate"><span class="pre">topological_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.validate_parameters"><code class="docutils literal notranslate"><span class="pre">validate_parameters()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 </ul>
 
         </div>
@@ -109,17 +127,24 @@ Works for binary, weighted, and directed graphs. See [1] for more details.</p>
 <p>Note from Gorka Zamora-lopez on directed graphs: For the adjacency matrix ‘A’, A_{ij} = 1 indicates j –&gt; i,
 which is the opposite of the conventional graph theory notation. If your adjacency
 matrices follow the graph theory convention, ensure to transpose it first.</p>
-<dl>
-<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): A square and nonnegative matrix representing network’s structure.
-alpha (float, optional): The scaling factor. Defaults to 1, meaning that no scaling is applied.
-normalize (bool, optional): If True, applies strength normalization to the matrix [2]. Defaults to False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency_matrix</strong> (<em>np.ndarray</em>) – A square and nonnegative matrix representing network’s structure.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – The scaling factor. Defaults to 1, meaning that no scaling is applied.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, applies strength normalization to the matrix [2]. Defaults to False.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>np.ndarray: The (scaled) communicability matrix. Shape: (N, N)</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The (scaled) communicability matrix. Shape: (N, N)</p>
 </dd>
-<dt>References:</dt><dd><p>[1] <a class="reference external" href="https://arxiv.org/abs/2307.02449">https://arxiv.org/abs/2307.02449</a></p>
-<p>[2] <a class="reference external" href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484">https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
+<p class="rubric">References</p>
+<p>[1] <a class="reference external" href="https://arxiv.org/abs/2307.02449">https://arxiv.org/abs/2307.02449</a></p>
+<p>[2] <a class="reference external" href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484">https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</a></p>
 </dd></dl>
 
 <dl class="py function">
@@ -135,8 +160,12 @@ index (int): Index of the target node whose activity is to be returned. Also com
 input_noise (np.ndarray): Input noise/signal for the dynamical model. Shape (N,T).
 model (callable, optional): The dynamical system model function to simulate with. Defaults to a linear dynamical system.
 model_params (dict, optional): Additional keyword arguments to pass to the model function.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>np.ndarray: Resulted activity of the target node given the lesion. Shape is (T,)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Resulted activity of the target node given the lesion. Shape is (T,)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -147,9 +176,16 @@ model_params (dict, optional): Additional keyword arguments to pass to the model
 <dd><dl class="simple">
 <dt>The identity function. It’s for the linear case and I literally stole it from Fabrizio:</dt><dd><p><a class="reference external" href="https://github.com/fabridamicelli/echoes/blob/master/echoes/utils.py">https://github.com/fabridamicelli/echoes/blob/master/echoes/utils.py</a></p>
 </dd>
-<dt>Args:</dt><dd><p>x (Union[float, np.ndarray]): input. can be a float or an np array.</p>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>np.ndarray</em><em>]</em>) – input. can be a float or an np array.</p>
 </dd>
-<dt>Returns:</dt><dd><p>Union[float, np.ndarray]: output. will be whatever the input is!</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output. will be whatever the input is!</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[float, np.ndarray]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -164,17 +200,24 @@ should be less than the spectral radius of the adjacency matrix. See [1] for mor
 <p>Note from Gorka Zamora-lopez on directed graphs: For the adjacency matrix ‘A’, A_{ij} = 1 indicates j –&gt; i,
 which is the opposite of the conventional graph theory notation. If your adjacency
 matrices follow the graph theory convention, ensure to transpose it first.</p>
-<dl>
-<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): A square and nonnegative matrix representing network’s structure.
-alpha (float): the decay rate. The smaller the decay rate, the quicker it assumes the walks to be subsiding.
-normalize (bool, optional): If True, applies strength normalization [2] to the matrix. Defaults to False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency_matrix</strong> (<em>np.ndarray</em>) – A square and nonnegative matrix representing network’s structure.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – the decay rate. The smaller the decay rate, the quicker it assumes the walks to be subsiding.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, applies strength normalization [2] to the matrix. Defaults to False.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>np.ndarray: The influence matrix for LAM. Shape: (N, N)</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The influence matrix for LAM. Shape: (N, N)</p>
 </dd>
-<dt>References:</dt><dd><p>[1] <a class="reference external" href="https://arxiv.org/abs/2307.02449">https://arxiv.org/abs/2307.02449</a></p>
-<p>[2] <a class="reference external" href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484">https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
+<p class="rubric">References</p>
+<p>[1] <a class="reference external" href="https://arxiv.org/abs/2307.02449">https://arxiv.org/abs/2307.02449</a></p>
+<p>[2] <a class="reference external" href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484">https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</a></p>
 </dd></dl>
 
 <dl class="py function">
@@ -185,13 +228,20 @@ like even days or weeks to run, depending on the size of the network and computa
 My personal recommendation is to try with fewer than 200 nodes on normal desktop computers but go on a server if there are more nodes.
 On my own computer with 16 threads, it took about 2h to run a network of N=150 nodes. Also, you don’t need to run your simulations for long, even 1 second is enough.
 However, if you have delayed systems then make sure the delay is less than 1 second otherwise the source technically doesn’t have time to influence the target.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>n_elements (int): The number of elements in the game (nodes in the network).
-game (callable, optional): The game function to be used for estimating the optimal influence. Defaults to default_game.
-game_kwargs (dict, optional): Additional keyword arguments to pass to the game function.
-msa_kwargs (dict, optional): Additional keyword arguments to pass to the MSA.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_elements</strong> (<em>int</em>) – The number of elements in the game (nodes in the network).</p></li>
+<li><p><strong>game</strong> (<em>callable</em><em>, </em><em>optional</em>) – The game function to be used for estimating the optimal influence. Defaults to default_game.</p></li>
+<li><p><strong>game_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the game function.</p></li>
+<li><p><strong>msa_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to the MSA.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>ShapleyModeND: The estimated optimal influence of each node over the others at each time point. This is basically a multi-index pandas dataframe.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The estimated optimal influence of each node over the others at each time point. This is basically a multi-index pandas dataframe.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ShapleyModeND</p>
 </dd>
 </dl>
 </dd></dl>
@@ -200,10 +250,15 @@ msa_kwargs (dict, optional): Additional keyword arguments to pass to the MSA.</p
 <dt class="sig sig-object py" id="yanat.core.relu">
 <span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">relu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#relu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.relu" title="Link to this definition"></a></dt>
 <dd><p>Computes the relu of the input:</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>x(Union[float, int, np.ndarray]): input. can be a float or an np array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>int</em><em>, </em><em>np.ndarray</em><em>]</em>) – input. can be a float or an np array.</p>
 </dd>
-<dt>Returns:</dt><dd><p>Union[float, np.ndarray]: output, squashed between 0 and 1.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output, squashed between 0 and 1.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[float, np.ndarray]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -236,18 +291,27 @@ normalize (bool, optional): If True, normalizes the matrix using strength normal
 <dt class="sig sig-object py" id="yanat.core.simulate_dynamical_system">
 <span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">simulate_dynamical_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_matrix:</span> <span class="pre">~numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coupling:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeconstant:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function:</span> <span class="pre">callable</span> <span class="pre">=</span> <span class="pre">CPUDispatcher(&lt;function</span> <span class="pre">identity&gt;)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#simulate_dynamical_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.simulate_dynamical_system" title="Link to this definition"></a></dt>
 <dd><p>Simulates a dynamical system described by the given paramteres.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): The adjacency matrix (N,N) make sure the matrix is normalized so the system remain stable.
-we can use <cite>ut.spectral_normalization(1,A)</cite> to normalize the matrix A.
-input_matrix (np.ndarray): Input of shape (N, T) where N is the number of nodes and T is the number of time steps.
-coupling (float, optional): The coupling strength between each node (scales the adjacency_matrix). Defaults to 1.
-This is another thing to take care of. If the system is unstable, try to reduce the coupling, like to 0.9.
-dt (float, optional): The time step of the simulation. Defaults to 0.001.
-duration (int, optional): The duration of the simulation in seconds. Defaults to 10.
-timeconstant (float, optional): The time constant of the nodes, I think it’s the same as the ‘relaxation time’. Defaults to 0.01.
-function (Callable, optional): The activation function. Defaults to identity, which means it’s linear.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency_matrix</strong> (<em>np.ndarray</em>) – The adjacency matrix (N,N) make sure the matrix is normalized so the system remain stable.
+we can use <code class="docutils literal notranslate"><span class="pre">ut.spectral_normalization(1,A)</span></code> to normalize the matrix A.</p></li>
+<li><p><strong>input_matrix</strong> (<em>np.ndarray</em>) – Input of shape (N, T) where N is the number of nodes and T is the number of time steps.</p></li>
+<li><p><strong>coupling</strong> (<em>try to reduce the</em>) – The coupling strength between each node (scales the adjacency_matrix). Defaults to 1.</p></li>
+<li><p><strong>unstable</strong> (<em>This is another thing to take care of. If the system is</em>)</p></li>
+<li><p><strong>coupling</strong></p></li>
+<li><p><strong>0.9.</strong> (<em>like to</em>)</p></li>
+<li><p><strong>dt</strong> (<em>float</em><em>, </em><em>optional</em>) – The time step of the simulation. Defaults to 0.001.</p></li>
+<li><p><strong>duration</strong> (<em>int</em><em>, </em><em>optional</em>) – The duration of the simulation in seconds. Defaults to 10.</p></li>
+<li><p><strong>timeconstant</strong> (<em>float</em><em>, </em><em>optional</em>) – The time constant of the nodes, I think it’s the same as the ‘relaxation time’. Defaults to 0.01.</p></li>
+<li><p><strong>function</strong> (<em>Callable</em><em>, </em><em>optional</em>) – The activation function. Defaults to identity, which means it’s linear.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>np.ndarray: The state of the dynamical system at each time step so again, the shape is (N, T)</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The state of the dynamical system at each time step so again, the shape is (N, T)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -257,10 +321,15 @@ function (Callable, optional): The activation function. Defaults to identity, wh
 <span class="sig-prename descclassname"><span class="pre">yanat.core.</span></span><span class="sig-name descname"><span class="pre">tanh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/core.html#tanh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.core.tanh" title="Link to this definition"></a></dt>
 <dd><p>Computes the hyperbolic tangent of the input. Again, I stole this from Fabrizio:
 <a class="reference external" href="https://github.com/fabridamicelli/echoes/blob/master/echoes/utils.py">https://github.com/fabridamicelli/echoes/blob/master/echoes/utils.py</a></p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>x (Union[float, int, np.ndarray]): input. can be a float or an np array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>int</em><em>, </em><em>np.ndarray</em><em>]</em>) – input. can be a float or an np array.</p>
 </dd>
-<dt>Returns:</dt><dd><p>Union[float, np.ndarray]: output, squashed between -1 and 1.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output, squashed between -1 and 1.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[float, np.ndarray]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -277,10 +346,15 @@ function (Callable, optional): The activation function. Defaults to identity, wh
 <dt class="sig sig-object py" id="yanat.utils.find_density">
 <span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">find_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#find_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.find_density" title="Link to this definition"></a></dt>
 <dd><p>Finds the density of the given adjacency matrix. It’s the ratio of the number of edges to the number of possible edges.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): The adjacency matrix of the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>adjacency_matrix</strong> (<em>np.ndarray</em>) – The adjacency matrix of the network.</p>
 </dd>
-<dt>Returns:</dt><dd><p>float: The density of the network.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The density of the network.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -289,10 +363,15 @@ function (Callable, optional): The activation function. Defaults to identity, wh
 <dt class="sig sig-object py" id="yanat.utils.log_minmax_normalize">
 <span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">log_minmax_normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#log_minmax_normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.log_minmax_normalize" title="Link to this definition"></a></dt>
 <dd><p>It first takes the logarithm of the data and then normalizes it between 0 and 1. It also takes care of the infinit values and those nasty things.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): Adjacency matrix of the network. Technically can be any matrix but I did it for the adjacency matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>adjacency_matrix</strong> (<em>np.ndarray</em>) – Adjacency matrix of the network. Technically can be any matrix but I did it for the adjacency matrices.</p>
 </dd>
-<dt>Returns:</dt><dd><p>np.ndarray: Normalized data with the same shape as the input.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized data with the same shape as the input.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -301,10 +380,15 @@ function (Callable, optional): The activation function. Defaults to identity, wh
 <dt class="sig sig-object py" id="yanat.utils.log_normalize">
 <span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">log_normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#log_normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.log_normalize" title="Link to this definition"></a></dt>
 <dd><p>Returns the logarithm of the data (adjacency_matrix) but also takes care of the infinit values.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>adjacency_matrix (np.ndarray): Adjacency matrix of the network. Technically can be any matrix but I did it for the adjacency matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>adjacency_matrix</strong> (<em>np.ndarray</em>) – Adjacency matrix of the network. Technically can be any matrix but I did it for the adjacency matrices.</p>
 </dd>
-<dt>Returns:</dt><dd><p>np.ndarray: Normalized data with the same shape as the input.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized data with the same shape as the input.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -313,10 +397,15 @@ function (Callable, optional): The activation function. Defaults to identity, wh
 <dt class="sig sig-object py" id="yanat.utils.minmax_normalize">
 <span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">minmax_normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#minmax_normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.minmax_normalize" title="Link to this definition"></a></dt>
 <dd><p>Normalizes data between 0 and 1.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>data (Union[pd.DataFrame, np.ndarray]): Data to be normalized. Can be a DataFrame or an np array but in both cases it should be at most 2D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Union</em><em>[</em><em>pd.DataFrame</em><em>, </em><em>np.ndarray</em><em>]</em>) – Data to be normalized. Can be a DataFrame or an np array but in both cases it should be at most 2D.</p>
 </dd>
-<dt>Returns:</dt><dd><p>Union[pd.DataFrame, np.ndarray]: Normalized data with the same shape as the input.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized data with the same shape as the input.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[pd.DataFrame, np.ndarray]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -325,12 +414,19 @@ function (Callable, optional): The activation function. Defaults to identity, wh
 <dt class="sig sig-object py" id="yanat.utils.optimal_influence_default_values">
 <span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">optimal_influence_default_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'adjacency_matrices_for_oi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">11</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#optimal_influence_default_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.optimal_influence_default_values" title="Link to this definition"></a></dt>
 <dd><p>Returns the default values for the parameters of the optimal_influence function.</p>
-<dl class="simple">
-<dt>Parameters:</dt><dd><p>adjacency_matrix (np.ndarray): The adjacency matrix representing the network structure.
-location (str, optional): The location to save the adjacency matrix file. Defaults to “adjacency_matrices_for_oi”.
-random_seed (int, optional): The random seed for generating input noise. Defaults to 11.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency_matrix</strong> (<em>np.ndarray</em>) – The adjacency matrix representing the network structure.</p></li>
+<li><p><strong>location</strong> (<em>str</em><em>, </em><em>optional</em>) – The location to save the adjacency matrix file. Defaults to “adjacency_matrices_for_oi”.</p></li>
+<li><p><strong>random_seed</strong> (<em>int</em><em>, </em><em>optional</em>) – The random seed for generating input noise. Defaults to 11.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>dict: Default values for the parameters of the optimal_influence function.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Default values for the parameters of the optimal_influence function.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -340,14 +436,21 @@ random_seed (int, optional): The random seed for generating input noise. Default
 <span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">simple_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter_space</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ParameterGrid</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ParameterGrid</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#simple_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.simple_fit" title="Link to this definition"></a></dt>
 <dd><p>Simple (and honestly, ugly) fitting function to find the best parameters for a (communication) model.
 Does a normal for-loop so it’s not as efficient but at the moment, doesn’t need to be either!</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>parameter_space (list): Parameter space to search in, as of now, it should be a list[ParameterGrid] and I gotta fix it!
-target_matrix (np.ndarray): Which matrix to compare the model’s output to, usually FC or OI.
-model (callable): Which (communication) model to use.
-model_kwargs (Optional[dict], optional): Extra things that the model wants. Defaults to None.
-normalize (Union[bool, callable], optional): If the output needs to be normalized before taking correlation. Defaults to False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameter_space</strong> (<em>list</em>) – Parameter space to search in, as of now, it should be a list[ParameterGrid] and I gotta fix it!</p></li>
+<li><p><strong>target_matrix</strong> (<em>np.ndarray</em>) – Which matrix to compare the model’s output to, usually FC or OI.</p></li>
+<li><p><strong>model</strong> (<em>callable</em>) – Which (communication) model to use.</p></li>
+<li><p><strong>model_kwargs</strong> (<em>Optional</em><em>[</em><em>dict</em><em>]</em><em>, </em><em>optional</em>) – Extra things that the model wants. Defaults to None.</p></li>
+<li><p><strong>normalize</strong> (<em>Union</em><em>[</em><em>bool</em><em>, </em><em>callable</em><em>]</em><em>, </em><em>optional</em>) – If the output needs to be normalized before taking correlation. Defaults to False.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>list: Updated copy of the parameter space with the correlation values.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Updated copy of the parameter space with the correlation values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
 </dd></dl>
@@ -356,11 +459,18 @@ normalize (Union[bool, callable], optional): If the output needs to be normalize
 <dt class="sig sig-object py" id="yanat.utils.spectral_normalization">
 <span class="sig-prename descclassname"><span class="pre">yanat.utils.</span></span><span class="sig-name descname"><span class="pre">spectral_normalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/utils.html#spectral_normalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.utils.spectral_normalization" title="Link to this definition"></a></dt>
 <dd><p>Normalizes the adjacency matrix to have a spectral radius of the target_radius. Good to keep the system stable.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>target_radius (float): A value below 1.0. It’s the spectral radius that you want to achieve. But use 1.0 if you’re planning to change the global coupling strength somewhere.
-adjacency_matrix (np.ndarray): Adjacency matrix of the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_radius</strong> (<em>float</em>) – A value below 1.0. It’s the spectral radius that you want to achieve. But use 1.0 if you’re planning to change the global coupling strength somewhere.</p></li>
+<li><p><strong>adjacency_matrix</strong> (<em>np.ndarray</em>) – Adjacency matrix of the network.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>np.ndarray: Normalized adjacency matrix with the same shape as the input.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized adjacency matrix with the same shape as the input.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -371,14 +481,342 @@ adjacency_matrix (np.ndarray): Adjacency matrix of the network.</p>
 <dd><p>Normalizes the adjacency matrix to subside the effect of high-strength (or high-degree) nodes.
 This function implements the strength normalization algorithm described in [1].
 The algorithm aims to reduce the influence of high-strength nodes in a network by scaling the adjacency matrix.</p>
-<dl class="simple">
-<dt>Parameters:</dt><dd><p>adjacency_matrix (np.ndarray): The adjacency matrix of the network. It should be a square matrix of shape (n, n), where n is the number of nodes in the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>adjacency_matrix</strong> (<em>np.ndarray</em>) – The adjacency matrix of the network. It should be a square matrix of shape (n, n), where n is the number of nodes in the network.</p>
 </dd>
-<dt>Returns:</dt><dd><p>np.ndarray: The normalized adjacency matrix with the same shape as the input.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The normalized adjacency matrix with the same shape as the input.</p>
 </dd>
-<dt>References:</dt><dd><p>[1] <a class="reference external" href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484">https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
+<p class="rubric">References</p>
+<p>[1] <a class="reference external" href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484">https://royalsocietypublishing.org/doi/full/10.1098/rsif.2008.0484</a></p>
+</dd></dl>
+
+</section>
+<section id="module-yanat.generative_game_theoric">
+<span id="yanat-generative-game-theoric"></span><h1>yanat.generative_game_theoric<a class="headerlink" href="#module-yanat.generative_game_theoric" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.compute_component_sizes">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">compute_component_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#compute_component_sizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.compute_component_sizes" title="Link to this definition"></a></dt>
+<dd><p>Computes the size of the connected component for each node using BFS.</p>
+<p>This function uses Numba for performance. It iterates over all nodes,
+and for each unvisited node, it performs a Breadth-First Search (BFS)
+to find all reachable nodes, counting them to determine the component size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>adjacency</strong> – The adjacency matrix (n_nodes, n_nodes).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An array of size (n_nodes,) where the i-th element is the size of the
+connected component containing node i.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.compute_local_payoff_impact">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">compute_local_payoff_impact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_fn_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#compute_local_payoff_impact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.compute_local_payoff_impact" title="Link to this definition"></a></dt>
+<dd><p>Computes the impact on payoff for connected nodes when their edge is removed.</p>
+<p>This function iterates through all existing edges, temporarily removes each one,
+and calculates the change in payoff for the two connected nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance_matrix</strong> – Pre-computed distance matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>adjacency_matrix</strong> – The binary, symmetric adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>distance_fn</strong> – Function to compute the ‘communication’ distance metric.</p></li>
+<li><p><strong>alpha</strong> – Weight of the distance term.</p></li>
+<li><p><strong>beta</strong> – Weight of the wiring cost term.</p></li>
+<li><p><strong>distance_fn_kwargs</strong> – Additional kwargs for distance_fn.</p></li>
+<li><p><strong>n_jobs</strong> – Number of parallel jobs (-1 for all cores).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An N x N matrix where <cite>matrix[i, j]</cite> contains the change in payoff for node <cite>i</cite>
+when the edge <cite>(i, j)</cite> is removed. The matrix is sparse (zeros where no edge exists).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.compute_node_payoff">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">compute_node_payoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjacency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectivity_penalty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_resources</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_fn_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#compute_node_payoff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.compute_node_payoff" title="Link to this definition"></a></dt>
+<dd><p>Computes the payoff for a single node based on distance, wiring cost, and connectivity.</p>
+<p>The payoff is defined as:
+Payoff = - (alpha * distance_term + beta * wiring_cost + connectivity_penalty * disconnected_nodes)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – Index of the node.</p></li>
+<li><p><strong>adjacency</strong> – The current adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>distance_matrix</strong> – Pre-computed Euclidean distance matrix (n_nodes, n_nodes) for wiring cost.</p></li>
+<li><p><strong>distance_fn</strong> – Function to compute the ‘communication’ distance metric (e.g., shortest path).</p></li>
+<li><p><strong>alpha</strong> – Weight of the distance term (communication efficiency).</p></li>
+<li><p><strong>beta</strong> – Weight of the wiring cost term (physical distance).</p></li>
+<li><p><strong>connectivity_penalty</strong> – Penalty for each node not in the same connected component.</p></li>
+<li><p><strong>node_resources</strong> – Optional vector of node resources to subsidize wiring cost.</p></li>
+<li><p><strong>distance_fn_kwargs</strong> – Additional keyword arguments for <cite>distance_fn</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The calculated payoff value (typically negative).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.find_optimal_alpha">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">find_optimal_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empirical_connectivity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(1.0,</span> <span class="pre">100.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_search_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectivity_penalty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payoff_tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#find_optimal_alpha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.find_optimal_alpha" title="Link to this definition"></a></dt>
+<dd><p>Finds the optimal alpha value that produces a network with density closest to empirical.</p>
+<p>This function uses a bisection search (with linear interpolation) to find the alpha
+parameter that results in a generated network with the same density as the provided
+empirical network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance_matrix</strong> – Precomputed distance matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>empirical_connectivity</strong> – Target connectivity matrix to match density with.</p></li>
+<li><p><strong>distance_fn</strong> – Distance metric function.</p></li>
+<li><p><strong>n_iterations</strong> – Number of iterations for each simulation.</p></li>
+<li><p><strong>beta</strong> – Wiring cost parameter.</p></li>
+<li><p><strong>alpha_range</strong> – Range for alpha search (min, max).</p></li>
+<li><p><strong>tolerance</strong> – Acceptable difference between densities.</p></li>
+<li><p><strong>max_search_iterations</strong> – Maximum number of search iterations.</p></li>
+<li><p><strong>random_seed</strong> – Random seed for reproducibility.</p></li>
+<li><p><strong>batch_size</strong> – Batch size for parallel processing.</p></li>
+<li><p><strong>symmetric</strong> – If True, enforces symmetry in generated networks.</p></li>
+<li><p><strong>n_jobs</strong> – Number of parallel jobs.</p></li>
+<li><p><strong>connectivity_penalty</strong> – Penalty for connectivity.</p></li>
+<li><p><strong>payoff_tolerance</strong> – Threshold for accepting new configuration.</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments passed to <cite>simulate_network_evolution</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>‘alpha’: Optimal alpha value.</p></li>
+<li><p>’density’: Density of the resulting network.</p></li>
+<li><p>’evolution’: Full history of adjacency matrices.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dist_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">emp_conn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">find_optimal_alpha</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">distance_matrix</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">empirical_connectivity</span><span class="o">=</span><span class="n">emp_conn</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">distance_fn</span><span class="o">=</span><span class="n">shortest_path_distance</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal alpha: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.get_param_value">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">get_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#get_param_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.get_param_value" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the value of a parameter at a specific time step <cite>t</cite>.</p>
+<p>If the parameter is a scalar, it returns the scalar.
+If it is an array (trajectory), it returns the value at index <cite>t</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param</strong> – The parameter, either a float or a numpy array.</p></li>
+<li><p><strong>t</strong> – The current time step (index).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The parameter value at time t.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.heat_kernel_distance">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">heat_kernel_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#heat_kernel_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.heat_kernel_distance" title="Link to this definition"></a></dt>
+<dd><p>Computes the heat kernel distance matrix at diffusion time t.</p>
+<p>The heat kernel distance is defined as -log(exp(-t * L)), where L is the Laplacian.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency_matrix</strong> – The adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>t</strong> – Diffusion time parameter.</p></li>
+<li><p><strong>eps</strong> – Small constant to avoid log(0).</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments passed to <cite>_apply_weighting</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The heat kernel distance matrix (n_nodes, n_nodes).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.propagation_distance">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">propagation_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_decay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#propagation_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.propagation_distance" title="Link to this definition"></a></dt>
+<dd><p>Computes the propagation distance matrix.</p>
+<p>The propagation distance is defined as the negative log of the influence matrix.
+The influence matrix is computed using either the LAM (Linear Attenuation Model)
+or SAR (Spatial Autoregressive) model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency_matrix</strong> – The adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>spatial_decay</strong> – Decay parameter (0 &lt; spatial_decay &lt; 1/spectral_radius).</p></li>
+<li><p><strong>symmetric</strong> – If True, uses SAR model (symmetric influence).
+If False, uses LAM model (directed influence).</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments passed to <cite>_apply_weighting</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The propagation distance matrix (n_nodes, n_nodes).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.resistance_distance">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">resistance_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#resistance_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.resistance_distance" title="Link to this definition"></a></dt>
+<dd><p>Computes resistance distances between all pairs of nodes.</p>
+<p>The resistance distance is computed using the Moore-Penrose pseudoinverse
+of the Laplacian matrix. It treats the graph as an electrical network
+where edges are resistors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency</strong> – The adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments passed to <cite>_apply_weighting</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resistance distance matrix (n_nodes, n_nodes).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.shortest_path_distance">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">shortest_path_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#shortest_path_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.shortest_path_distance" title="Link to this definition"></a></dt>
+<dd><p>Computes shortest-path distances between all pairs of nodes.</p>
+<p>Uses Dijkstra’s algorithm via <cite>scipy.sparse.csgraph.shortest_path</cite>.
+If the graph is weighted (via <cite>weight_coefficient</cite>), edge weights are treated
+as costs (inverted if they represent strength).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency_matrix</strong> – The adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments passed to <cite>_apply_weighting</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The shortest path distance matrix (n_nodes, n_nodes).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.simulate_network_evolution">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">simulate_network_evolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectivity_penalty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_adjacency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_resources</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payoff_tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#simulate_network_evolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.simulate_network_evolution" title="Link to this definition"></a></dt>
+<dd><p>Simulates the evolution of a network through game-theoretic payoff optimization.</p>
+<p>At each step, random edges are selected and “flipped” (added or removed).
+The change is accepted if it improves the payoff for at least one of the nodes involved
+(unilateral consent), subject to a tolerance threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance_matrix</strong> – Pre-computed Euclidean distance matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>n_iterations</strong> – Total number of simulation steps.</p></li>
+<li><p><strong>distance_fn</strong> – Function to compute the ‘nonphysical’ distance metric, e.g., communication.</p></li>
+<li><p><strong>alpha</strong> – Weight of the distance term (float or trajectory array).</p></li>
+<li><p><strong>beta</strong> – Weight of the wiring cost term (float or trajectory array).</p></li>
+<li><p><strong>connectivity_penalty</strong> – Penalty for disconnected components (float or trajectory array).</p></li>
+<li><p><strong>initial_adjacency</strong> – Starting adjacency matrix. If None, starts with a ring lattice.</p></li>
+<li><p><strong>n_jobs</strong> – Number of parallel jobs for payoff computation (-1 for all cores).</p></li>
+<li><p><strong>batch_size</strong> – Number of potential edge flips to evaluate per iteration.</p></li>
+<li><p><strong>node_resources</strong> – Optional resources for each node to subsidize wiring costs.</p></li>
+<li><p><strong>payoff_tolerance</strong> – Minimum payoff improvement required to accept a change.</p></li>
+<li><p><strong>random_seed</strong> – Seed for random number generator.</p></li>
+<li><p><strong>symmetric</strong> – If True, enforces undirected edges (symmetry).</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments passed to <cite>distance_fn</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A 3D array of shape (n_nodes, n_nodes, n_iterations) containing the
+adjacency matrix at each time step.</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dist_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">history</span> <span class="o">=</span> <span class="n">simulate_network_evolution</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">distance_matrix</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">n_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">distance_fn</span><span class="o">=</span><span class="n">shortest_path_distance</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">connectivity_penalty</span><span class="o">=</span><span class="mf">10.0</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.topological_distance">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">topological_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adj_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#topological_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.topological_distance" title="Link to this definition"></a></dt>
+<dd><p>Computes pairwise topological distance based on cosine similarity of neighbors.</p>
+<p>Returns 1 - cosine_similarity. Nodes with similar connectivity patterns
+will have small topological distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_matrix</strong> – The binary adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments passed to <cite>_apply_weighting</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The topological distance matrix (n_nodes, n_nodes).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric.validate_parameters">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric.</span></span><span class="sig-name descname"><span class="pre">validate_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">trajectories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_float</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_zero</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_none</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric.html#validate_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric.validate_parameters" title="Link to this definition"></a></dt>
+<dd><p>Validates simulation parameters to ensure they are of correct type and shape.</p>
+<p>This function checks if parameters are either scalars (floats/ints) or arrays
+matching the simulation length. It also checks for allowed values (zero, None).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sim_length</strong> – The total number of iterations in the simulation.</p></li>
+<li><p><strong>*trajectories</strong> – Variable number of parameter trajectories to validate.</p></li>
+<li><p><strong>names</strong> – A tuple of names corresponding to the trajectories, used for error messages.</p></li>
+<li><p><strong>allow_float</strong> – A tuple of booleans indicating if a parameter can be a scalar float.</p></li>
+<li><p><strong>allow_zero</strong> – A tuple of booleans indicating if a parameter can be zero.</p></li>
+<li><p><strong>allow_none</strong> – A tuple of booleans indicating if a parameter can be None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If any parameter does not meet the specified criteria (type, shape, value).</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">validate_parameters</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="mi">1000</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="mf">1.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">allow_float</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">allow_zero</span><span class="o">=</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -388,6 +826,7 @@ The algorithm aims to reduce the influence of high-strength nodes in a network b
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="modules.html" class="btn btn-neutral float-left" title="YANAT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

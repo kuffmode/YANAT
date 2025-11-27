@@ -5,8 +5,12 @@ from numba import njit
 from typeguard import typechecked
 from scipy.linalg import expm, solve
 import _pickle as pk
-from msapy import msa
-from msapy.datastructures import ShapleyModeND
+try:
+    from msapy import msa
+    from msapy.datastructures import ShapleyModeND
+except ImportError:
+    msa = None
+    ShapleyModeND = None
 
 from copy import deepcopy
 
@@ -318,6 +322,12 @@ def optimal_influence(
     """
     game_kwargs: dict = game_kwargs if game_kwargs else {}
     msa_kwargs: dict = msa_kwargs if msa_kwargs else {}
+
+    if msa is None:
+        raise ImportError(
+            "msapy is not installed. Please install it with `uv sync --extra optimal_influence` "
+            "or `pip install yanat[optimal_influence]` to use this function."
+        )
 
     oi: ShapleyModeND = msa.estimate_causal_influences(
         elements=list(range(n_elements)),

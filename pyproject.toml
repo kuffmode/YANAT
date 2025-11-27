@@ -1,6 +1,6 @@
 [project]
 name = "yanat"
-version = "0.1.0"
+version = "0.1.1"
 description = "Yet Another Network Analysis Toolbox"
 authors = [
     { name = "Kayson Fakhar" },
@@ -20,7 +20,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "msapy>=1.7.3",
     "numba>=0.62.1",
     "numpy>=2.3.4",
     "scipy>=1.16.3",
@@ -31,6 +30,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+optimal_influence = [
+    "msapy>=1.7.3",
+]
 dev = [
     "sphinx>=8.2.3",
     "sphinx-rtd-theme>=3.0.2",

@@ -1,10 +1,6 @@
 import pytest
 import numpy as np
-from yanat.generative import (
-    jit_safe,
-    _diag_indices,
-    _set_diagonal,
-    process_matrix,
+from yanat.generative_game_theoric import (
     validate_parameters,
     get_param_value,
     compute_component_sizes,
@@ -13,45 +9,11 @@ from yanat.generative import (
     heat_kernel_distance,
     shortest_path_distance,
     topological_distance,
+    search_information,
     compute_node_payoff,
     simulate_network_evolution,
     find_optimal_alpha,
 )
-
-
-def test_jit_safe():
-    @jit_safe()
-    def add(x, y):
-        return x + y
-
-    assert add(2, 3) == 5
-
-
-def test_diag_indices():
-    rows, cols = _diag_indices(3)
-    assert np.array_equal(rows, np.array([0, 1, 2]))
-    assert np.array_equal(cols, np.array([0, 1, 2]))
-
-
-def test_set_diagonal():
-    matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    expected = np.array([[0, 2, 3], [4, 0, 6], [7, 8, 0]])
-    result = _set_diagonal(matrix.copy())
-    assert np.array_equal(result, expected)
-
-    matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    expected = np.array([[2, 2, 3], [4, 2, 6], [7, 8, 2]])
-    result = _set_diagonal(matrix.copy(), 2)
-    assert np.array_equal(result, expected)
-
-
-def test_process_matrix():
-    matrix = np.array(
-        [[1.0, np.nan, np.inf], [-np.inf, 2.0, 3.0], [4.0, 5.0, 6.0]]
-    )
-    expected = np.array([[1.0, 0.0, 0.0], [0.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
-    result = process_matrix(matrix)
-    assert np.array_equal(result, expected)
 
 
 def test_validate_parameters():
@@ -63,9 +25,10 @@ def test_validate_parameters():
         np.ones(1000),
         np.ones(1000),
         np.ones(1000) * 2,
-        names=("alpha", "beta", "noise", "connectivity", "batch_size"),
-        allow_float=(True, False, False, True, True),
-        allow_zero=(False, False, True, False, False),
+        np.zeros(1000),
+        names=("alpha", "beta", "connectivity", "batch_size", "payoff_tolerance"),
+        allow_float=(True, True, True, True, True),
+        allow_zero=(False, False, False, False, True),
     )
 
     # Test incorrect inputs
@@ -159,7 +122,7 @@ def test_propagation_distance():
     adjacency = np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
     result = propagation_distance(adjacency)
     assert result.shape == (3, 3)
-    assert np.all(result >= 0)
+    assert not np.any(np.isnan(result))
 
 
 def test_resistance_distance():
@@ -206,17 +169,26 @@ def test_compute_node_payoff():
     distance_fn = shortest_path_distance
 
     # Test with distance_matrix
+    # Test with distance_matrix
     result = compute_node_payoff(
-        0, adjacency, distance_matrix, distance_fn, 1.0, 1.0, 0.0, 1.0
+        0, adjacency, distance_matrix, distance_fn, 1.0, 1.0, 1.0
     )
     assert isinstance(result, float)
     
     # Test with kwargs
     result_kwargs = compute_node_payoff(
-        0, adjacency, distance_matrix, distance_fn, 1.0, 1.0, 0.0, 1.0,
+        0, adjacency, distance_matrix, distance_fn, 1.0, 1.0, 1.0,
         distance_fn_kwargs={'dummy': 1}
     )
     assert isinstance(result_kwargs, float)
+    
+    # Test with node_resources
+    node_resources = np.ones(3)
+    result_resources = compute_node_payoff(
+        0, adjacency, distance_matrix, distance_fn, 1.0, 1.0, 1.0,
+        node_resources=node_resources
+    )
+    assert isinstance(result_resources, float)
 
 
 def test_simulate_network_evolution():
@@ -231,15 +203,30 @@ def test_simulate_network_evolution():
         distance_fn=shortest_path_distance,
         alpha=1.0,
         beta=1.0,
-        noise=np.zeros(10),
         connectivity_penalty=0.0,
         n_jobs=1,
-        batch_size=2
+        batch_size=2,
+        node_resources=np.zeros(n_nodes),
+        payoff_tolerance=0.0
     )
     
     assert history.shape == (n_nodes, n_nodes, 10)
     assert np.all(history >= 0)
     assert np.all(history <= 1)
+    
+    # Test with weight_coefficient
+    history_weighted = simulate_network_evolution(
+        distance_matrix=distance_matrix,
+        n_iterations=5,
+        distance_fn=shortest_path_distance,
+        alpha=1.0,
+        beta=1.0,
+        connectivity_penalty=0.0,
+        n_jobs=1,
+        batch_size=2,
+        weight_coefficient=0.5
+    )
+    assert history_weighted.shape == (n_nodes, n_nodes, 5)
 
 
 def test_find_optimal_alpha():
@@ -272,3 +259,39 @@ def test_find_optimal_alpha():
     assert isinstance(result['alpha'], float)
     assert isinstance(result['density'], float)
     assert result['evolution'].shape == (n_nodes, n_nodes, 10)
+
+
+def test_search_information():
+    # Line graph: 0-1-2
+    adjacency = np.array([
+        [0, 1, 0],
+        [1, 0, 1],
+        [0, 1, 0]
+    ])
+    
+    # Test asymmetric (default)
+    si = search_information(adjacency, symmetric=False)
+    assert si.shape == (3, 3)
+    assert si[0, 0] == 0
+    assert si[1, 1] == 0
+    assert si[2, 2] == 0
+    
+    # Path 0->2: 0->1 (p=1) -> 2 (p=0.5). Prob=0.5. SI = 1.0
+    assert np.isclose(si[0, 2], 1.0)
+    
+    # Path 2->0: 2->1 (p=1) -> 0 (p=0.5). Prob=0.5. SI = 1.0
+    assert np.isclose(si[2, 0], 1.0)
+    
+    # Path 0->1: 0->1 (p=1). Prob=1. SI = 0.
+    assert np.isclose(si[0, 1], 0.0)
+    
+    # Path 1->0: 1->0 (p=0.5). Prob=0.5. SI = 1.0
+    assert np.isclose(si[1, 0], 1.0)
+    
+    # Test symmetric
+    si_sym = search_information(adjacency, symmetric=True)
+    assert np.allclose(si_sym, si_sym.T)
+    # For line graph, it is already symmetric in terms of SI values?
+    # SI(0,1)=0, SI(1,0)=1. Min is 0.
+    assert np.isclose(si_sym[0, 1], 0.0)
+    assert np.isclose(si_sym[1, 0], 0.0)

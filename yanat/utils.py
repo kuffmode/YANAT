@@ -8,6 +8,7 @@ from pathlib import Path
 from sklearn.model_selection import ParameterGrid
 from tqdm import tqdm
 from copy import deepcopy
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 def find_density(adjacency_matrix: np.ndarray) -> float:
@@ -205,5 +206,10 @@ def _matrix_correlation(one_matrix: np.ndarray, another_matrix: np.ndarray) -> f
     """
     return np.corrcoef(one_matrix.flatten(), another_matrix.flatten())[0, 1]
 
-
+def calculate_endpoint_similarity(synthetic_matrix, empirical_matrix):
+    similarities = np.zeros(synthetic_matrix.shape[0])
+    for i in range(synthetic_matrix.shape[0]):
+        similarities[i] = cosine_similarity(synthetic_matrix[i].reshape(1, -1),
+                                            empirical_matrix[i].reshape(1, -1))
+    return similarities
 # TODO: add a function to create example adjacency matrices for demonstration purposes.

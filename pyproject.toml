@@ -1,6 +1,6 @@
 [project]
 name = "yanat"
-version = "0.1.2"
+version = "0.1.3"
 description = "Yet Another Network Analysis Toolbox"
 authors = [
     { name = "Kayson Fakhar" },

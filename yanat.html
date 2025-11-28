@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yanat.core &mdash; YANAT 0.1.3 documentation</title>
+  <title>yanat.core &mdash; YANAT 0.1.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=360bc84d"></script>
+      <script src="_static/documentation_options.js?v=fd825880"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -83,6 +83,17 @@
 <li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.simulate_network_evolution"><code class="docutils literal notranslate"><span class="pre">simulate_network_evolution()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.topological_distance"><code class="docutils literal notranslate"><span class="pre">topological_distance()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric.validate_parameters"><code class="docutils literal notranslate"><span class="pre">validate_parameters()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-yanat.generative_game_theoric_numba">yanat.generative_game_theoric_numba</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric_numba.compute_node_payoff"><code class="docutils literal notranslate"><span class="pre">compute_node_payoff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric_numba.find_optimal_alpha"><code class="docutils literal notranslate"><span class="pre">find_optimal_alpha()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric_numba.heat_kernel_distance"><code class="docutils literal notranslate"><span class="pre">heat_kernel_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric_numba.propagation_distance"><code class="docutils literal notranslate"><span class="pre">propagation_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric_numba.resistance_distance"><code class="docutils literal notranslate"><span class="pre">resistance_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric_numba.shortest_path_distance"><code class="docutils literal notranslate"><span class="pre">shortest_path_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric_numba.simulate_network_evolution"><code class="docutils literal notranslate"><span class="pre">simulate_network_evolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yanat.generative_game_theoric_numba.topological_distance"><code class="docutils literal notranslate"><span class="pre">topological_distance()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -817,6 +828,234 @@ matching the simulation length. It also checks for allowed values (zero, None).<
 <span class="gp">... </span><span class="p">)</span>
 </pre></div>
 </div>
+</dd></dl>
+
+</section>
+<section id="module-yanat.generative_game_theoric_numba">
+<span id="yanat-generative-game-theoric-numba"></span><h1>yanat.generative_game_theoric_numba<a class="headerlink" href="#module-yanat.generative_game_theoric_numba" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric_numba.compute_node_payoff">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric_numba.</span></span><span class="sig-name descname"><span class="pre">compute_node_payoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjacency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_fn_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectivity_penalty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_resources</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_decay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric_numba.html#compute_node_payoff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric_numba.compute_node_payoff" title="Link to this definition"></a></dt>
+<dd><p>Computes the payoff for a single node based on distance, wiring cost, and connectivity.</p>
+<p>The payoff is defined as:
+Payoff = - (alpha * distance_term + beta * wiring_cost + connectivity_penalty * disconnected_nodes)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – Index of the node.</p></li>
+<li><p><strong>adjacency</strong> – The current adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>distance_matrix</strong> – Pre-computed Euclidean distance matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>distance_fn_type</strong> – Integer code for distance function (0: prop, 1: res, 2: heat, 3: sp, 4: topo).</p></li>
+<li><p><strong>alpha</strong> – Weight of the distance term.</p></li>
+<li><p><strong>beta</strong> – Weight of the wiring cost term.</p></li>
+<li><p><strong>connectivity_penalty</strong> – Penalty for disconnected components.</p></li>
+<li><p><strong>node_resources</strong> – Optional vector of node resources.</p></li>
+<li><p><strong>spatial_decay</strong> – Parameter for propagation distance.</p></li>
+<li><p><strong>symmetric</strong> – Parameter for propagation distance.</p></li>
+<li><p><strong>weight_coefficient</strong> – Parameter for distance weighting.</p></li>
+<li><p><strong>t_param</strong> – Parameter for heat kernel distance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The calculated payoff value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric_numba.find_optimal_alpha">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric_numba.</span></span><span class="sig-name descname"><span class="pre">find_optimal_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empirical_connectivity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(1.0,</span> <span class="pre">100.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_search_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectivity_penalty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payoff_tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric_numba.html#find_optimal_alpha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric_numba.find_optimal_alpha" title="Link to this definition"></a></dt>
+<dd><p>Finds the optimal alpha value that produces a network with density closest to empirical.</p>
+<p>This function uses a bisection search (with linear interpolation) to find the alpha
+parameter that results in a generated network with the same density as the provided
+empirical network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance_matrix</strong> – Precomputed distance matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>empirical_connectivity</strong> – Target connectivity matrix to match density with.</p></li>
+<li><p><strong>distance_fn</strong> – Distance metric function.</p></li>
+<li><p><strong>n_iterations</strong> – Number of iterations for each simulation.</p></li>
+<li><p><strong>beta</strong> – Wiring cost parameter.</p></li>
+<li><p><strong>alpha_range</strong> – Range for alpha search (min, max).</p></li>
+<li><p><strong>tolerance</strong> – Acceptable difference between densities.</p></li>
+<li><p><strong>max_search_iterations</strong> – Maximum number of search iterations.</p></li>
+<li><p><strong>random_seed</strong> – Random seed for reproducibility.</p></li>
+<li><p><strong>batch_size</strong> – Batch size for parallel processing.</p></li>
+<li><p><strong>symmetric</strong> – If True, enforces symmetry in generated networks.</p></li>
+<li><p><strong>n_jobs</strong> – Number of parallel jobs.</p></li>
+<li><p><strong>connectivity_penalty</strong> – Penalty for connectivity.</p></li>
+<li><p><strong>payoff_tolerance</strong> – Threshold for accepting new configuration.</p></li>
+<li><p><strong>verbose</strong> – If True, prints search progress.</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments passed to <cite>simulate_network_evolution</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>‘alpha’: Optimal alpha value.</p></li>
+<li><p>’density’: Density of the resulting network.</p></li>
+<li><p>’evolution’: Full history of adjacency matrices.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dist_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">emp_conn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">find_optimal_alpha</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">distance_matrix</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">empirical_connectivity</span><span class="o">=</span><span class="n">emp_conn</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">distance_fn</span><span class="o">=</span><span class="n">shortest_path_distance</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal alpha: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric_numba.heat_kernel_distance">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric_numba.</span></span><span class="sig-name descname"><span class="pre">heat_kernel_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric_numba.html#heat_kernel_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric_numba.heat_kernel_distance" title="Link to this definition"></a></dt>
+<dd><p>Computes the heat kernel distance matrix at diffusion time t using Numba.</p>
+<p>The heat kernel distance is defined as -log(exp(-t * L)), where L is the Laplacian.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency_matrix</strong> – The adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>t</strong> – Diffusion time parameter.</p></li>
+<li><p><strong>eps</strong> – Small constant to avoid log(0).</p></li>
+<li><p><strong>distance_matrix</strong> – The distance matrix (n_nodes, n_nodes). Required if weight_coefficient &gt; 0.</p></li>
+<li><p><strong>weight_coefficient</strong> – The decay coefficient for distance weighting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The heat kernel distance matrix (n_nodes, n_nodes).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric_numba.propagation_distance">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric_numba.</span></span><span class="sig-name descname"><span class="pre">propagation_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_decay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric_numba.html#propagation_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric_numba.propagation_distance" title="Link to this definition"></a></dt>
+<dd><p>Computes the propagation distance matrix using Numba.</p>
+<p>NOTE: This is a bit unstable under Numba with larger spatial decay values.
+Try heat kernel distance for symmetric graphs, they’re highly correlated.</p>
+<p>The propagation distance is defined as the negative log of the influence matrix.
+The influence matrix is computed using either the LAM (Linear Attenuation Model)
+or SAR (Spatial Autoregressive) model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency_matrix</strong> – The adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>spatial_decay</strong> – Decay parameter (0 &lt; spatial_decay &lt; 1/spectral_radius).</p></li>
+<li><p><strong>symmetric</strong> – If True, uses SAR model (symmetric influence).
+If False, uses LAM model (directed influence).</p></li>
+<li><p><strong>distance_matrix</strong> – The distance matrix (n_nodes, n_nodes). Required if weight_coefficient &gt; 0.</p></li>
+<li><p><strong>weight_coefficient</strong> – The decay coefficient for distance weighting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The propagation distance matrix (n_nodes, n_nodes).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric_numba.resistance_distance">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric_numba.</span></span><span class="sig-name descname"><span class="pre">resistance_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric_numba.html#resistance_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric_numba.resistance_distance" title="Link to this definition"></a></dt>
+<dd><p>Computes resistance distances between all pairs of nodes using Numba.</p>
+<p>The resistance distance is computed using the Moore-Penrose pseudoinverse
+of the Laplacian matrix. It treats the graph as an electrical network
+where edges are resistors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency</strong> – The adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>distance_matrix</strong> – The distance matrix (n_nodes, n_nodes). Required if weight_coefficient &gt; 0.</p></li>
+<li><p><strong>weight_coefficient</strong> – The decay coefficient for distance weighting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resistance distance matrix (n_nodes, n_nodes).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric_numba.shortest_path_distance">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric_numba.</span></span><span class="sig-name descname"><span class="pre">shortest_path_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjacency_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric_numba.html#shortest_path_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric_numba.shortest_path_distance" title="Link to this definition"></a></dt>
+<dd><p>Computes shortest-path distances between all pairs of nodes using Floyd-Warshall (Numba).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjacency_matrix</strong> – The adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>distance_matrix</strong> – The distance matrix (n_nodes, n_nodes). Required if weight_coefficient &gt; 0.</p></li>
+<li><p><strong>weight_coefficient</strong> – The decay coefficient for distance weighting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The shortest path distance matrix (n_nodes, n_nodes).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric_numba.simulate_network_evolution">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric_numba.</span></span><span class="sig-name descname"><span class="pre">simulate_network_evolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'propagation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectivity_penalty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_adjacency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_resources</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payoff_tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_decay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric_numba.html#simulate_network_evolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric_numba.simulate_network_evolution" title="Link to this definition"></a></dt>
+<dd><p>Simulates the evolution of a network through game-theoretic payoff optimization using Numba.</p>
+<p>At each step, random edges are selected and “flipped” (added or removed).
+The change is accepted if it improves the payoff for at least one of the nodes involved
+(unilateral consent), subject to a tolerance threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance_matrix</strong> – Pre-computed Euclidean distance matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>n_iterations</strong> – Total number of simulation steps.</p></li>
+<li><p><strong>distance_fn</strong> – Name of the distance function (“propagation”, “resistance”, “heat”, “shortest”, “topological”) or the function itself.</p></li>
+<li><p><strong>alpha</strong> – Weight of the distance term (float or trajectory array).</p></li>
+<li><p><strong>beta</strong> – Weight of the wiring cost term (float or trajectory array).</p></li>
+<li><p><strong>connectivity_penalty</strong> – Penalty for disconnected components (float or trajectory array).</p></li>
+<li><p><strong>initial_adjacency</strong> – Starting adjacency matrix. If None, starts with a ring lattice.</p></li>
+<li><p><strong>n_jobs</strong> – Ignored in Numba implementation (uses internal parallelism).</p></li>
+<li><p><strong>batch_size</strong> – Number of potential edge flips to evaluate per iteration.</p></li>
+<li><p><strong>node_resources</strong> – Optional resources for each node to subsidize wiring costs.</p></li>
+<li><p><strong>payoff_tolerance</strong> – Minimum payoff improvement required to accept a change.</p></li>
+<li><p><strong>random_seed</strong> – Seed for random number generator.</p></li>
+<li><p><strong>symmetric</strong> – If True, enforces undirected edges (symmetry).</p></li>
+<li><p><strong>spatial_decay</strong> – Decay parameter for propagation distance.</p></li>
+<li><p><strong>weight_coefficient</strong> – Weight coefficient for distance weighting.</p></li>
+<li><p><strong>t</strong> – Time parameter for heat kernel distance.</p></li>
+<li><p><strong>verbose</strong> – If True, shows progress bar.</p></li>
+<li><p><strong>**kwargs</strong> – Additional arguments (ignored).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A 3D array of shape (n_nodes, n_nodes, n_iterations) containing the
+adjacency matrix at each time step.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yanat.generative_game_theoric_numba.topological_distance">
+<span class="sig-prename descclassname"><span class="pre">yanat.generative_game_theoric_numba.</span></span><span class="sig-name descname"><span class="pre">topological_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adj_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/yanat/generative_game_theoric_numba.html#topological_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yanat.generative_game_theoric_numba.topological_distance" title="Link to this definition"></a></dt>
+<dd><p>Computes pairwise topological distance based on cosine similarity of neighbors using Numba.</p>
+<p>Returns 1 - cosine_similarity. Nodes with similar connectivity patterns
+will have small topological distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_matrix</strong> – The adjacency matrix (n_nodes, n_nodes).</p></li>
+<li><p><strong>distance_matrix</strong> – The distance matrix (n_nodes, n_nodes). Required if weight_coefficient &gt; 0.</p></li>
+<li><p><strong>weight_coefficient</strong> – The decay coefficient for distance weighting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The topological distance matrix (n_nodes, n_nodes).</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

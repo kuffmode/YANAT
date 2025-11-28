@@ -1,0 +1,1075 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>yanat.generative_game_theoric_numba &mdash; YANAT 0.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=fd825880"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            YANAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">YANAT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">YANAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">yanat.generative_game_theoric_numba</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for yanat.generative_game_theoric_numba</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">njit</span><span class="p">,</span> <span class="n">prange</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;propagation_distance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;resistance_distance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;heat_kernel_distance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;shortest_path_distance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;topological_distance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;compute_node_payoff&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;simulate_network_evolution&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;find_optimal_alpha&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;validate_parameters&quot;</span>
+<span class="p">]</span>
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># Helpers</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_power_iteration</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes spectral radius using power iteration.</span>
+<span class="sd">    Robust to asymmetric matrices by tracking norm growth.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span>
+        
+    <span class="n">norm_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">norm_v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">/</span> <span class="n">norm_v</span>
+    
+    <span class="n">prev_rho</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iters</span><span class="p">):</span>
+        <span class="n">v_next</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">v</span>
+        <span class="n">norm_next</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v_next</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">norm_next</span> <span class="o">&lt;</span> <span class="mf">1e-12</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+            
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v_next</span> <span class="o">/</span> <span class="n">norm_next</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">norm_next</span>
+        
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rho</span> <span class="o">-</span> <span class="n">prev_rho</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">rho</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rho</span>
+            
+        <span class="n">prev_rho</span> <span class="o">=</span> <span class="n">rho</span>
+        
+    <span class="k">return</span> <span class="n">rho</span>
+
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_spectral_normalization</span><span class="p">(</span><span class="n">adjacency</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">target_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="c1"># Use power iteration for speed (O(N^2) vs O(N^3))</span>
+    <span class="n">spec_rad</span> <span class="o">=</span> <span class="n">_power_iteration</span><span class="p">(</span><span class="n">adjacency</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">spec_rad</span> <span class="o">&gt;</span> <span class="mf">1e-9</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">adjacency</span> <span class="o">*</span> <span class="p">(</span><span class="n">target_radius</span> <span class="o">/</span> <span class="n">spec_rad</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">adjacency</span>
+
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_apply_weighting</span><span class="p">(</span><span class="n">adjacency</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">weight_coefficient</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">adjacency</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">weight_coefficient</span> <span class="o">*</span> <span class="n">distance_matrix</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">adjacency</span> <span class="o">*</span> <span class="n">weights</span>
+
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_log_normalize_neg</span><span class="p">(</span><span class="n">matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes -log(matrix) safely.&quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mf">1e-20</span><span class="p">:</span>
+                <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_component_size</span><span class="p">(</span><span class="n">adjacency</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the size of the connected component containing the given node using BFS.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">adjacency</span><span class="p">)</span>
+    <span class="n">visited</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">tail</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="n">q</span><span class="p">[</span><span class="n">tail</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span>
+    <span class="n">tail</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">visited</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">head</span> <span class="o">&lt;</span> <span class="n">tail</span><span class="p">:</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="n">head</span><span class="p">]</span>
+        <span class="n">head</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">adjacency</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">visited</span><span class="p">[</span><span class="n">v</span><span class="p">]:</span>
+                <span class="n">visited</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">q</span><span class="p">[</span><span class="n">tail</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="n">tail</span> <span class="o">+=</span> <span class="mi">1</span>
+                
+    <span class="k">return</span> <span class="n">count</span>
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># Distance Functions</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="propagation_distance">
+<a class="viewcode-back" href="../../yanat.html#yanat.generative_game_theoric_numba.propagation_distance">[docs]</a>
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">propagation_distance</span><span class="p">(</span>
+    <span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+    <span class="n">spatial_decay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span> 
+    <span class="n">symmetric</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
+    <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+    <span class="n">weight_coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the propagation distance matrix using Numba. </span>
+<span class="sd">    </span>
+<span class="sd">    NOTE: This is a bit unstable under Numba with larger spatial decay values. </span>
+<span class="sd">    Try heat kernel distance for symmetric graphs, they&#39;re highly correlated.</span>
+
+<span class="sd">    The propagation distance is defined as the negative log of the influence matrix.</span>
+<span class="sd">    The influence matrix is computed using either the LAM (Linear Attenuation Model)</span>
+<span class="sd">    or SAR (Spatial Autoregressive) model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        adjacency_matrix: The adjacency matrix (n_nodes, n_nodes).</span>
+<span class="sd">        spatial_decay: Decay parameter (0 &lt; spatial_decay &lt; 1/spectral_radius).</span>
+<span class="sd">        symmetric: If True, uses SAR model (symmetric influence). </span>
+<span class="sd">                   If False, uses LAM model (directed influence).</span>
+<span class="sd">        distance_matrix: The distance matrix (n_nodes, n_nodes). Required if weight_coefficient &gt; 0.</span>
+<span class="sd">        weight_coefficient: The decay coefficient for distance weighting.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The propagation distance matrix (n_nodes, n_nodes).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">distance_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">_apply_weighting</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+    <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">_spectral_normalization</span><span class="p">(</span><span class="n">weighted_adj</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">A_sys</span> <span class="o">=</span> <span class="n">I</span> <span class="o">-</span> <span class="n">spatial_decay</span> <span class="o">*</span> <span class="n">weighted_adj</span>
+    
+    <span class="c1"># Invert</span>
+    <span class="n">inv_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A_sys</span><span class="p">,</span> <span class="n">I</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">symmetric</span><span class="p">:</span>
+        <span class="n">influence</span> <span class="o">=</span> <span class="n">inv_matrix</span> <span class="o">@</span> <span class="n">inv_matrix</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">influence</span> <span class="o">=</span> <span class="n">inv_matrix</span>
+        
+    <span class="k">return</span> <span class="n">_log_normalize_neg</span><span class="p">(</span><span class="n">influence</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="resistance_distance">
+<a class="viewcode-back" href="../../yanat.html#yanat.generative_game_theoric_numba.resistance_distance">[docs]</a>
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">resistance_distance</span><span class="p">(</span>
+    <span class="n">adjacency</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+    <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+    <span class="n">weight_coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes resistance distances between all pairs of nodes using Numba.</span>
+
+<span class="sd">    The resistance distance is computed using the Moore-Penrose pseudoinverse</span>
+<span class="sd">    of the Laplacian matrix. It treats the graph as an electrical network</span>
+<span class="sd">    where edges are resistors.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        adjacency: The adjacency matrix (n_nodes, n_nodes).</span>
+<span class="sd">        distance_matrix: The distance matrix (n_nodes, n_nodes). Required if weight_coefficient &gt; 0.</span>
+<span class="sd">        weight_coefficient: The decay coefficient for distance weighting.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The resistance distance matrix (n_nodes, n_nodes).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">distance_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">_apply_weighting</span><span class="p">(</span><span class="n">adjacency</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">adjacency</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+    <span class="c1"># Symmetrize</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="p">(</span><span class="n">weighted_adj</span> <span class="o">+</span> <span class="n">weighted_adj</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    
+    <span class="n">degree</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span> <span class="o">-</span> <span class="n">W</span>
+    
+    <span class="c1"># Pseudoinverse</span>
+    <span class="n">pinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+    
+    <span class="n">diag_pinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">pinv</span><span class="p">)</span>
+    
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">adjacency</span><span class="p">)</span>
+    <span class="n">resistance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">diag_pinv</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">diag_pinv</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pinv</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">val</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span> <span class="n">val</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">resistance</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            
+    <span class="k">return</span> <span class="n">resistance</span></div>
+
+
+<div class="viewcode-block" id="heat_kernel_distance">
+<a class="viewcode-back" href="../../yanat.html#yanat.generative_game_theoric_numba.heat_kernel_distance">[docs]</a>
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">heat_kernel_distance</span><span class="p">(</span>
+    <span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+    <span class="n">t</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> 
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span> 
+    <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+    <span class="n">weight_coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the heat kernel distance matrix at diffusion time t using Numba.</span>
+
+<span class="sd">    The heat kernel distance is defined as -log(exp(-t * L)), where L is the Laplacian.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        adjacency_matrix: The adjacency matrix (n_nodes, n_nodes).</span>
+<span class="sd">        t: Diffusion time parameter.</span>
+<span class="sd">        eps: Small constant to avoid log(0).</span>
+<span class="sd">        distance_matrix: The distance matrix (n_nodes, n_nodes). Required if weight_coefficient &gt; 0.</span>
+<span class="sd">        weight_coefficient: The decay coefficient for distance weighting.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The heat kernel distance matrix (n_nodes, n_nodes).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">distance_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">_apply_weighting</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+    <span class="n">degree</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weighted_adj</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span> <span class="o">-</span> <span class="n">weighted_adj</span>
+    
+    <span class="c1"># Use eigh for symmetric matrices (Laplacian is symmetric for undirected)</span>
+    <span class="c1"># If directed, this might be wrong, but heat kernel is typically for undirected.</span>
+    <span class="c1"># Numba supports eigh.</span>
+    <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+    
+    <span class="c1"># exp(-t * L) = V * diag(exp(-t * vals)) * V.T</span>
+    <span class="n">exp_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t</span> <span class="o">*</span> <span class="n">vals</span><span class="p">)</span>
+    
+    <span class="c1"># kernel = vecs @ diag(exp_vals) @ vecs.T</span>
+    <span class="c1"># Optimized: (vecs * exp_vals) @ vecs.T</span>
+    <span class="n">kernel</span> <span class="o">=</span> <span class="p">(</span><span class="n">vecs</span> <span class="o">*</span> <span class="n">exp_vals</span><span class="p">)</span> <span class="o">@</span> <span class="n">vecs</span><span class="o">.</span><span class="n">T</span>
+    
+    <span class="c1"># -log</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">kernel</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="n">eps</span><span class="p">:</span> <span class="n">val</span> <span class="o">=</span> <span class="n">eps</span>
+            <span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            
+    <span class="k">return</span> <span class="n">dist</span></div>
+
+
+<div class="viewcode-block" id="shortest_path_distance">
+<a class="viewcode-back" href="../../yanat.html#yanat.generative_game_theoric_numba.shortest_path_distance">[docs]</a>
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shortest_path_distance</span><span class="p">(</span>
+    <span class="n">adjacency_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+    <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+    <span class="n">weight_coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes shortest-path distances between all pairs of nodes using Floyd-Warshall (Numba).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        adjacency_matrix: The adjacency matrix (n_nodes, n_nodes).</span>
+<span class="sd">        distance_matrix: The distance matrix (n_nodes, n_nodes). Required if weight_coefficient &gt; 0.</span>
+<span class="sd">        weight_coefficient: The decay coefficient for distance weighting.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The shortest path distance matrix (n_nodes, n_nodes).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">distance_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">_apply_weighting</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">)</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    
+    <span class="c1"># Initialize</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">weighted_adj</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">w</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">w</span>
+                
+    <span class="c1"># Floyd-Warshall</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">dist</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;</span> <span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]:</span>
+                    <span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+                    
+    <span class="k">return</span> <span class="n">dist</span></div>
+
+
+<div class="viewcode-block" id="topological_distance">
+<a class="viewcode-back" href="../../yanat.html#yanat.generative_game_theoric_numba.topological_distance">[docs]</a>
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">topological_distance</span><span class="p">(</span>
+    <span class="n">adj_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+    <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+    <span class="n">weight_coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes pairwise topological distance based on cosine similarity of neighbors using Numba.</span>
+
+<span class="sd">    Returns 1 - cosine_similarity. Nodes with similar connectivity patterns </span>
+<span class="sd">    will have small topological distance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        adj_matrix: The adjacency matrix (n_nodes, n_nodes).</span>
+<span class="sd">        distance_matrix: The distance matrix (n_nodes, n_nodes). Required if weight_coefficient &gt; 0.</span>
+<span class="sd">        weight_coefficient: The decay coefficient for distance weighting.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The topological distance matrix (n_nodes, n_nodes).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">distance_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">_apply_weighting</span><span class="p">(</span><span class="n">adj_matrix</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">weighted_adj</span> <span class="o">=</span> <span class="n">adj_matrix</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">adj_matrix</span><span class="p">)</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    
+    <span class="c1"># Precompute norms</span>
+    <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">norms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weighted_adj</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">norms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">norms</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">sim</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weighted_adj</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">weighted_adj</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                <span class="n">sim</span> <span class="o">=</span> <span class="n">dot</span> <span class="o">/</span> <span class="p">(</span><span class="n">norms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">norms</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+            
+            <span class="n">d</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">sim</span>
+            <span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+            <span class="n">dist</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+            
+    <span class="k">return</span> <span class="n">dist</span></div>
+
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># Simulation Logic</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="compute_node_payoff">
+<a class="viewcode-back" href="../../yanat.html#yanat.generative_game_theoric_numba.compute_node_payoff">[docs]</a>
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_node_payoff</span><span class="p">(</span>
+    <span class="n">node</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">adjacency</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">distance_fn_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># 0: prop, 1: res, 2: heat, 3: sp, 4: topo</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">connectivity_penalty</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">node_resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="c1"># Distance fn params</span>
+    <span class="n">spatial_decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">symmetric</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">weight_coefficient</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">t_param</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the payoff for a single node based on distance, wiring cost, and connectivity.</span>
+
+<span class="sd">    The payoff is defined as:</span>
+<span class="sd">    Payoff = - (alpha * distance_term + beta * wiring_cost + connectivity_penalty * disconnected_nodes)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        node: Index of the node.</span>
+<span class="sd">        adjacency: The current adjacency matrix (n_nodes, n_nodes).</span>
+<span class="sd">        distance_matrix: Pre-computed Euclidean distance matrix (n_nodes, n_nodes).</span>
+<span class="sd">        distance_fn_type: Integer code for distance function (0: prop, 1: res, 2: heat, 3: sp, 4: topo).</span>
+<span class="sd">        alpha: Weight of the distance term.</span>
+<span class="sd">        beta: Weight of the wiring cost term.</span>
+<span class="sd">        connectivity_penalty: Penalty for disconnected components.</span>
+<span class="sd">        node_resources: Optional vector of node resources.</span>
+<span class="sd">        spatial_decay: Parameter for propagation distance.</span>
+<span class="sd">        symmetric: Parameter for propagation distance.</span>
+<span class="sd">        weight_coefficient: Parameter for distance weighting.</span>
+<span class="sd">        t_param: Parameter for heat kernel distance.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The calculated payoff value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Dispatch</span>
+    <span class="k">if</span> <span class="n">distance_fn_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="n">propagation_distance</span><span class="p">(</span><span class="n">adjacency</span><span class="p">,</span> <span class="n">spatial_decay</span><span class="p">,</span> <span class="n">symmetric</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">distance_fn_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="n">resistance_distance</span><span class="p">(</span><span class="n">adjacency</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">distance_fn_type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="n">heat_kernel_distance</span><span class="p">(</span><span class="n">adjacency</span><span class="p">,</span> <span class="n">t_param</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">distance_fn_type</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="n">shortest_path_distance</span><span class="p">(</span><span class="n">adjacency</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="n">topological_distance</span><span class="p">(</span><span class="n">adjacency</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+        
+    <span class="c1"># Payoff</span>
+    <span class="n">comm_cost</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dists</span><span class="p">[</span><span class="n">node</span><span class="p">])</span>
+    
+    <span class="n">euclidean</span> <span class="o">=</span> <span class="n">distance_matrix</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">node_resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">effective_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">euclidean</span> <span class="o">-</span> <span class="n">node_resources</span><span class="p">[</span><span class="n">node</span><span class="p">])</span>
+        <span class="n">wiring_cost</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">adjacency</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">*</span> <span class="n">effective_dist</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wiring_cost</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">adjacency</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">*</span> <span class="n">euclidean</span><span class="p">)</span>
+        
+    <span class="n">payoff</span> <span class="o">=</span> <span class="o">-</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">comm_cost</span> <span class="o">+</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">wiring_cost</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">connectivity_penalty</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">comp_size</span> <span class="o">=</span> <span class="n">_get_component_size</span><span class="p">(</span><span class="n">adjacency</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+        <span class="n">payoff</span> <span class="o">-=</span> <span class="n">connectivity_penalty</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">adjacency</span><span class="p">)</span> <span class="o">-</span> <span class="n">comp_size</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">payoff</span></div>
+
+
+<span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_candidates_batch</span><span class="p">(</span>
+    <span class="n">current_adj</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">current_payoffs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">candidates_u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">candidates_v</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">connectivity_penalty</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">node_resources</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">distance_fn_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">spatial_decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">symmetric</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">weight_coefficient</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">t_param</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    
+    <span class="n">n_candidates</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidates_u</span><span class="p">)</span>
+    <span class="n">is_beneficial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_candidates</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+    <span class="n">n_nodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_adj</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">n_candidates</span><span class="p">):</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">candidates_u</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">candidates_v</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        
+        <span class="c1"># Copy adj</span>
+        <span class="n">cand_adj</span> <span class="o">=</span> <span class="n">current_adj</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">cand_adj</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span>
+        <span class="n">cand_adj</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">if</span> <span class="n">symmetric</span><span class="p">:</span>
+            <span class="n">cand_adj</span><span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            
+        <span class="c1"># Compute new payoffs for u and v</span>
+        <span class="n">payoff_u</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">payoff_v</span> <span class="o">=</span> <span class="mf">0.0</span>
+        
+        <span class="c1"># Wiring</span>
+        <span class="k">if</span> <span class="n">beta</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">euclidean_u</span> <span class="o">=</span> <span class="n">distance_matrix</span><span class="p">[</span><span class="n">u</span><span class="p">]</span>
+            <span class="n">euclidean_v</span> <span class="o">=</span> <span class="n">distance_matrix</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
+            
+            <span class="n">effective_dist_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">euclidean_u</span> <span class="o">-</span> <span class="n">node_resources</span><span class="p">[</span><span class="n">u</span><span class="p">])</span>
+            <span class="n">effective_dist_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">euclidean_v</span> <span class="o">-</span> <span class="n">node_resources</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
+            
+            <span class="n">wiring_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cand_adj</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">*</span> <span class="n">effective_dist_u</span><span class="p">)</span>
+            <span class="n">wiring_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cand_adj</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">*</span> <span class="n">effective_dist_v</span><span class="p">)</span>
+            
+            <span class="n">payoff_u</span> <span class="o">-=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">wiring_u</span>
+            <span class="n">payoff_v</span> <span class="o">-=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">wiring_v</span>
+        
+        <span class="c1"># Comm</span>
+        <span class="k">if</span> <span class="n">alpha</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">distance_fn_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dists</span> <span class="o">=</span> <span class="n">propagation_distance</span><span class="p">(</span><span class="n">cand_adj</span><span class="p">,</span> <span class="n">spatial_decay</span><span class="p">,</span> <span class="n">symmetric</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">distance_fn_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">dists</span> <span class="o">=</span> <span class="n">resistance_distance</span><span class="p">(</span><span class="n">cand_adj</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">distance_fn_type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">dists</span> <span class="o">=</span> <span class="n">heat_kernel_distance</span><span class="p">(</span><span class="n">cand_adj</span><span class="p">,</span> <span class="n">t_param</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">distance_fn_type</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">dists</span> <span class="o">=</span> <span class="n">shortest_path_distance</span><span class="p">(</span><span class="n">cand_adj</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dists</span> <span class="o">=</span> <span class="n">topological_distance</span><span class="p">(</span><span class="n">cand_adj</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">)</span>
+            
+            <span class="n">comm_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dists</span><span class="p">[</span><span class="n">u</span><span class="p">])</span>
+            <span class="n">comm_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dists</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
+            
+            <span class="n">payoff_u</span> <span class="o">-=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">comm_u</span>
+            <span class="n">payoff_v</span> <span class="o">-=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">comm_v</span>
+            
+        <span class="n">new_payoff_u</span> <span class="o">=</span> <span class="n">payoff_u</span>
+        <span class="n">new_payoff_v</span> <span class="o">=</span> <span class="n">payoff_v</span>
+        
+        <span class="c1"># Connectivity penalty</span>
+        <span class="k">if</span> <span class="n">connectivity_penalty</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="n">comp_size_u</span> <span class="o">=</span> <span class="n">_get_component_size</span><span class="p">(</span><span class="n">cand_adj</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+            <span class="n">new_payoff_u</span> <span class="o">-=</span> <span class="n">connectivity_penalty</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_nodes</span> <span class="o">-</span> <span class="n">comp_size_u</span><span class="p">)</span>
+            
+            <span class="n">comp_size_v</span> <span class="o">=</span> <span class="n">_get_component_size</span><span class="p">(</span><span class="n">cand_adj</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">new_payoff_v</span> <span class="o">-=</span> <span class="n">connectivity_penalty</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_nodes</span> <span class="o">-</span> <span class="n">comp_size_v</span><span class="p">)</span>
+        
+        <span class="n">diff_u</span> <span class="o">=</span> <span class="n">new_payoff_u</span> <span class="o">-</span> <span class="n">current_payoffs</span><span class="p">[</span><span class="n">u</span><span class="p">]</span>
+        <span class="n">diff_v</span> <span class="o">=</span> <span class="n">new_payoff_v</span> <span class="o">-</span> <span class="n">current_payoffs</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
+        
+        <span class="k">if</span> <span class="n">diff_u</span> <span class="o">&gt;</span> <span class="n">tolerance</span> <span class="ow">or</span> <span class="n">diff_v</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">:</span>
+            <span class="n">is_beneficial</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            
+    <span class="k">return</span> <span class="n">candidates_u</span><span class="p">,</span> <span class="n">candidates_v</span><span class="p">,</span> <span class="n">is_beneficial</span>
+
+<span class="nd">@njit</span><span class="p">(</span><span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_all_payoffs</span><span class="p">(</span>
+    <span class="n">adj</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+    <span class="n">d_mat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+    <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
+    <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
+    <span class="n">cp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">node_res</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">d_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+    <span class="n">s_decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
+    <span class="n">sym</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> 
+    <span class="n">w_coef</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
+    <span class="n">t_par</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">adj</span><span class="p">)</span>
+    <span class="n">payoffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">a</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">d_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dists</span> <span class="o">=</span> <span class="n">propagation_distance</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">s_decay</span><span class="p">,</span> <span class="n">sym</span><span class="p">,</span> <span class="n">d_mat</span><span class="p">,</span> <span class="n">w_coef</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">d_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dists</span> <span class="o">=</span> <span class="n">resistance_distance</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">d_mat</span><span class="p">,</span> <span class="n">w_coef</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">d_type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">dists</span> <span class="o">=</span> <span class="n">heat_kernel_distance</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">t_par</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="n">d_mat</span><span class="p">,</span> <span class="n">w_coef</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">d_type</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">dists</span> <span class="o">=</span> <span class="n">shortest_path_distance</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">d_mat</span><span class="p">,</span> <span class="n">w_coef</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dists</span> <span class="o">=</span> <span class="n">topological_distance</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">d_mat</span><span class="p">,</span> <span class="n">w_coef</span><span class="p">)</span>
+            
+        <span class="n">comm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">payoffs</span> <span class="o">-=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">comm</span>
+    
+    <span class="c1"># Wiring with resources</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">wiring</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">eff_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">d_mat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">node_res</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">wiring</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">adj</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">eff_dist</span><span class="p">)</span>
+        <span class="n">payoffs</span> <span class="o">-=</span> <span class="n">b</span> <span class="o">*</span> <span class="n">wiring</span>
+    
+    <span class="k">if</span> <span class="n">cp</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">sz</span> <span class="o">=</span> <span class="n">_get_component_size</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">payoffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">cp</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">sz</span><span class="p">)</span>
+            
+    <span class="k">return</span> <span class="n">payoffs</span>
+
+<div class="viewcode-block" id="simulate_network_evolution">
+<a class="viewcode-back" href="../../yanat.html#yanat.generative_game_theoric_numba.simulate_network_evolution">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">simulate_network_evolution</span><span class="p">(</span>
+    <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">n_iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">distance_fn</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;propagation&quot;</span><span class="p">,</span> <span class="c1"># String or dummy</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">connectivity_penalty</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">initial_adjacency</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># Ignored, used for compat</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+    <span class="n">node_resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">payoff_tolerance</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">random_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">symmetric</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># Distance fn specific args</span>
+    <span class="n">spatial_decay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">weight_coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">t</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="c1"># for heat kernel</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simulates the evolution of a network through game-theoretic payoff optimization using Numba.</span>
+
+<span class="sd">    At each step, random edges are selected and &quot;flipped&quot; (added or removed). </span>
+<span class="sd">    The change is accepted if it improves the payoff for at least one of the nodes involved </span>
+<span class="sd">    (unilateral consent), subject to a tolerance threshold.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        distance_matrix: Pre-computed Euclidean distance matrix (n_nodes, n_nodes).</span>
+<span class="sd">        n_iterations: Total number of simulation steps.</span>
+<span class="sd">        distance_fn: Name of the distance function (&quot;propagation&quot;, &quot;resistance&quot;, &quot;heat&quot;, &quot;shortest&quot;, &quot;topological&quot;) or the function itself.</span>
+<span class="sd">        alpha: Weight of the distance term (float or trajectory array).</span>
+<span class="sd">        beta: Weight of the wiring cost term (float or trajectory array).</span>
+<span class="sd">        connectivity_penalty: Penalty for disconnected components (float or trajectory array).</span>
+<span class="sd">        initial_adjacency: Starting adjacency matrix. If None, starts with a ring lattice.</span>
+<span class="sd">        n_jobs: Ignored in Numba implementation (uses internal parallelism).</span>
+<span class="sd">        batch_size: Number of potential edge flips to evaluate per iteration.</span>
+<span class="sd">        node_resources: Optional resources for each node to subsidize wiring costs.</span>
+<span class="sd">        payoff_tolerance: Minimum payoff improvement required to accept a change.</span>
+<span class="sd">        random_seed: Seed for random number generator.</span>
+<span class="sd">        symmetric: If True, enforces undirected edges (symmetry).</span>
+<span class="sd">        spatial_decay: Decay parameter for propagation distance.</span>
+<span class="sd">        weight_coefficient: Weight coefficient for distance weighting.</span>
+<span class="sd">        t: Time parameter for heat kernel distance.</span>
+<span class="sd">        verbose: If True, shows progress bar.</span>
+<span class="sd">        **kwargs: Additional arguments (ignored).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A 3D array of shape (n_nodes, n_nodes, n_iterations) containing the </span>
+<span class="sd">        adjacency matrix at each time step.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">random_seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
+        
+    <span class="c1"># Map distance_fn to int</span>
+    <span class="c1"># 0: prop, 1: res, 2: heat, 3: sp, 4: topo</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">distance_fn</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">distance_fn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">distance_fn</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        
+    <span class="k">if</span> <span class="s2">&quot;propagation&quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span> <span class="n">dist_type</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="s2">&quot;resistance&quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span> <span class="n">dist_type</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="s2">&quot;heat&quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span> <span class="n">dist_type</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="s2">&quot;shortest&quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span> <span class="n">dist_type</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">elif</span> <span class="s2">&quot;topological&quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span> <span class="n">dist_type</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">dist_type</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Default</span>
+    
+    <span class="n">n_nodes</span> <span class="o">=</span> <span class="n">distance_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="n">initial_adjacency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">adjacency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_nodes</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_nodes</span><span class="p">)</span>
+        <span class="n">adjacency</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">n_nodes</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">adjacency</span><span class="p">[(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">n_nodes</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">adjacency</span> <span class="o">=</span> <span class="n">initial_adjacency</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+    <span class="k">if</span> <span class="n">node_resources</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">node_resources_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_nodes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">node_resources_arr</span> <span class="o">=</span> <span class="n">node_resources</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        
+    <span class="n">history</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_nodes</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">,</span> <span class="n">n_iterations</span><span class="p">))</span>
+    <span class="n">history</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">adjacency</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_val</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">param</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">param</span>
+    
+    <span class="c1"># Initial payoffs</span>
+    <span class="n">current_payoffs</span> <span class="o">=</span> <span class="n">_compute_all_payoffs</span><span class="p">(</span>
+        <span class="n">adj</span><span class="o">=</span><span class="n">adjacency</span><span class="p">,</span> 
+        <span class="n">d_mat</span><span class="o">=</span><span class="n">distance_matrix</span><span class="p">,</span> 
+        <span class="n">a</span><span class="o">=</span><span class="n">get_val</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> 
+        <span class="n">b</span><span class="o">=</span><span class="n">get_val</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> 
+        <span class="n">cp</span><span class="o">=</span><span class="n">get_val</span><span class="p">(</span><span class="n">connectivity_penalty</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">node_res</span><span class="o">=</span><span class="n">node_resources_arr</span><span class="p">,</span>
+        <span class="n">d_type</span><span class="o">=</span><span class="n">dist_type</span><span class="p">,</span> 
+        <span class="n">s_decay</span><span class="o">=</span><span class="n">spatial_decay</span><span class="p">,</span> 
+        <span class="n">sym</span><span class="o">=</span><span class="n">symmetric</span><span class="p">,</span> 
+        <span class="n">w_coef</span><span class="o">=</span><span class="n">weight_coefficient</span><span class="p">,</span> 
+        <span class="n">t_par</span><span class="o">=</span><span class="n">t</span>
+    <span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_iterations</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Simulating network evolution&quot;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">verbose</span><span class="p">):</span>
+        <span class="n">a_t</span> <span class="o">=</span> <span class="n">get_val</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+        <span class="n">b_t</span> <span class="o">=</span> <span class="n">get_val</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+        <span class="n">cp_t</span> <span class="o">=</span> <span class="n">get_val</span><span class="p">(</span><span class="n">connectivity_penalty</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+        <span class="n">bs_t</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">get_val</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">step</span><span class="p">))</span>
+        <span class="n">tol_t</span> <span class="o">=</span> <span class="n">get_val</span><span class="p">(</span><span class="n">payoff_tolerance</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+        
+        <span class="c1"># Recompute current payoffs if params changed</span>
+        <span class="n">current_payoffs</span> <span class="o">=</span> <span class="n">_compute_all_payoffs</span><span class="p">(</span>
+            <span class="n">adj</span><span class="o">=</span><span class="n">adjacency</span><span class="p">,</span> 
+            <span class="n">d_mat</span><span class="o">=</span><span class="n">distance_matrix</span><span class="p">,</span> 
+            <span class="n">a</span><span class="o">=</span><span class="n">a_t</span><span class="p">,</span> 
+            <span class="n">b</span><span class="o">=</span><span class="n">b_t</span><span class="p">,</span> 
+            <span class="n">cp</span><span class="o">=</span><span class="n">cp_t</span><span class="p">,</span>
+            <span class="n">node_res</span><span class="o">=</span><span class="n">node_resources_arr</span><span class="p">,</span>
+            <span class="n">d_type</span><span class="o">=</span><span class="n">dist_type</span><span class="p">,</span> 
+            <span class="n">s_decay</span><span class="o">=</span><span class="n">spatial_decay</span><span class="p">,</span> 
+            <span class="n">sym</span><span class="o">=</span><span class="n">symmetric</span><span class="p">,</span> 
+            <span class="n">w_coef</span><span class="o">=</span><span class="n">weight_coefficient</span><span class="p">,</span> 
+            <span class="n">t_par</span><span class="o">=</span><span class="n">t</span>
+        <span class="p">)</span>
+        
+        <span class="n">u_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">,</span> <span class="n">bs_t</span><span class="p">)</span>
+        <span class="n">v_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">,</span> <span class="n">bs_t</span><span class="p">)</span>
+        
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">u_indices</span> <span class="o">==</span> <span class="n">v_indices</span>
+        <span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>
+            <span class="n">v_indices</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mask</span><span class="p">))</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">u_indices</span> <span class="o">==</span> <span class="n">v_indices</span>
+            
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">beneficial</span> <span class="o">=</span> <span class="n">_evaluate_candidates_batch</span><span class="p">(</span>
+            <span class="n">current_adj</span><span class="o">=</span><span class="n">adjacency</span><span class="p">,</span> 
+            <span class="n">current_payoffs</span><span class="o">=</span><span class="n">current_payoffs</span><span class="p">,</span> 
+            <span class="n">candidates_u</span><span class="o">=</span><span class="n">u_indices</span><span class="p">,</span> 
+            <span class="n">candidates_v</span><span class="o">=</span><span class="n">v_indices</span><span class="p">,</span>
+            <span class="n">distance_matrix</span><span class="o">=</span><span class="n">distance_matrix</span><span class="p">,</span> 
+            <span class="n">alpha</span><span class="o">=</span><span class="n">a_t</span><span class="p">,</span> 
+            <span class="n">beta</span><span class="o">=</span><span class="n">b_t</span><span class="p">,</span> 
+            <span class="n">connectivity_penalty</span><span class="o">=</span><span class="n">cp_t</span><span class="p">,</span>
+            <span class="n">node_resources</span><span class="o">=</span><span class="n">node_resources_arr</span><span class="p">,</span>
+            <span class="n">distance_fn_type</span><span class="o">=</span><span class="n">dist_type</span><span class="p">,</span>
+            <span class="n">spatial_decay</span><span class="o">=</span><span class="n">spatial_decay</span><span class="p">,</span> 
+            <span class="n">symmetric</span><span class="o">=</span><span class="n">symmetric</span><span class="p">,</span> 
+            <span class="n">weight_coefficient</span><span class="o">=</span><span class="n">weight_coefficient</span><span class="p">,</span> 
+            <span class="n">t_param</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> 
+            <span class="n">tolerance</span><span class="o">=</span><span class="n">tol_t</span>
+        <span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">beneficial</span><span class="p">):</span>
+            <span class="n">idx_ben</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">beneficial</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">idx_ben</span><span class="p">:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">u_indices</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">v_indices</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">adjacency</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span>
+                <span class="n">adjacency</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="k">if</span> <span class="n">symmetric</span><span class="p">:</span>
+                    <span class="n">adjacency</span><span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                    
+        <span class="n">history</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">step</span><span class="p">]</span> <span class="o">=</span> <span class="n">adjacency</span>
+        
+    <span class="k">return</span> <span class="n">history</span></div>
+
+
+
+<span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_impact_batch</span><span class="p">(</span>
+    <span class="n">adjacency</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">dist_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">spatial_decay</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">weight_coefficient</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">t_param</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">n_edges</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+    <span class="n">n_nodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">adjacency</span><span class="p">)</span>
+    <span class="n">impact_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_nodes</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">n_edges</span><span class="p">):</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        
+        <span class="n">payoff_u_old</span> <span class="o">=</span> <span class="n">compute_node_payoff</span><span class="p">(</span>
+            <span class="n">u</span><span class="p">,</span> <span class="n">adjacency</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">dist_type</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">spatial_decay</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">,</span> <span class="n">t_param</span>
+        <span class="p">)</span>
+        <span class="n">payoff_v_old</span> <span class="o">=</span> <span class="n">compute_node_payoff</span><span class="p">(</span>
+            <span class="n">v</span><span class="p">,</span> <span class="n">adjacency</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">dist_type</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">spatial_decay</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">,</span> <span class="n">t_param</span>
+        <span class="p">)</span>
+
+        <span class="n">adj_lesioned</span> <span class="o">=</span> <span class="n">adjacency</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">adj_lesioned</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">adj_lesioned</span><span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        
+        <span class="n">payoff_u_new</span> <span class="o">=</span> <span class="n">compute_node_payoff</span><span class="p">(</span>
+            <span class="n">u</span><span class="p">,</span> <span class="n">adj_lesioned</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">dist_type</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">spatial_decay</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">,</span> <span class="n">t_param</span>
+        <span class="p">)</span>
+        <span class="n">payoff_v_new</span> <span class="o">=</span> <span class="n">compute_node_payoff</span><span class="p">(</span>
+            <span class="n">v</span><span class="p">,</span> <span class="n">adj_lesioned</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">dist_type</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">spatial_decay</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">weight_coefficient</span><span class="p">,</span> <span class="n">t_param</span>
+        <span class="p">)</span>
+        
+        <span class="n">impact_matrix</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">payoff_u_new</span> <span class="o">-</span> <span class="n">payoff_u_old</span>
+        <span class="n">impact_matrix</span><span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">payoff_v_new</span> <span class="o">-</span> <span class="n">payoff_v_old</span>
+        
+    <span class="k">return</span> <span class="n">impact_matrix</span>
+
+<div class="viewcode-block" id="find_optimal_alpha">
+<a class="viewcode-back" href="../../yanat.html#yanat.generative_game_theoric_numba.find_optimal_alpha">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_optimal_alpha</span><span class="p">(</span>
+    <span class="n">distance_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">empirical_connectivity</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">distance_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">n_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">alpha_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">),</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">max_search_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">random_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">11</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="n">symmetric</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">connectivity_penalty</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">payoff_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the optimal alpha value that produces a network with density closest to empirical.</span>
+
+<span class="sd">    This function uses a bisection search (with linear interpolation) to find the alpha</span>
+<span class="sd">    parameter that results in a generated network with the same density as the provided</span>
+<span class="sd">    empirical network.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        distance_matrix: Precomputed distance matrix (n_nodes, n_nodes).</span>
+<span class="sd">        empirical_connectivity: Target connectivity matrix to match density with.</span>
+<span class="sd">        distance_fn: Distance metric function.</span>
+<span class="sd">        n_iterations: Number of iterations for each simulation.</span>
+<span class="sd">        beta: Wiring cost parameter.</span>
+<span class="sd">        alpha_range: Range for alpha search (min, max).</span>
+<span class="sd">        tolerance: Acceptable difference between densities.</span>
+<span class="sd">        max_search_iterations: Maximum number of search iterations.</span>
+<span class="sd">        random_seed: Random seed for reproducibility.</span>
+<span class="sd">        batch_size: Batch size for parallel processing.</span>
+<span class="sd">        symmetric: If True, enforces symmetry in generated networks.</span>
+<span class="sd">        n_jobs: Number of parallel jobs.</span>
+<span class="sd">        connectivity_penalty: Penalty for connectivity.</span>
+<span class="sd">        payoff_tolerance: Threshold for accepting new configuration.</span>
+<span class="sd">        verbose: If True, prints search progress.</span>
+<span class="sd">        **kwargs: Additional arguments passed to `simulate_network_evolution`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dictionary containing:</span>
+<span class="sd">            - &#39;alpha&#39;: Optimal alpha value.</span>
+<span class="sd">            - &#39;density&#39;: Density of the resulting network.</span>
+<span class="sd">            - &#39;evolution&#39;: Full history of adjacency matrices.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; dist_mat = np.random.rand(10, 10)</span>
+<span class="sd">        &gt;&gt;&gt; emp_conn = np.random.randint(0, 2, (10, 10))</span>
+<span class="sd">        &gt;&gt;&gt; result = find_optimal_alpha(</span>
+<span class="sd">        ...     distance_matrix=dist_mat,</span>
+<span class="sd">        ...     empirical_connectivity=emp_conn,</span>
+<span class="sd">        ...     distance_fn=shortest_path_distance</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; print(f&quot;Optimal alpha: {result[&#39;alpha&#39;]}&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate empirical density</span>
+    <span class="n">n_nodes</span> <span class="o">=</span> <span class="n">empirical_connectivity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">empirical_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">empirical_connectivity</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_nodes</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_nodes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+    
+    <span class="c1"># Set up fixed parameters as vectors</span>
+    <span class="n">beta_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
+    <span class="n">penalty_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">connectivity_penalty</span><span class="p">)</span>
+    <span class="n">batch_size_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+    <span class="n">tolerance_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">payoff_tolerance</span><span class="p">)</span>
+    
+    <span class="c1"># Function to simulate network and get density</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">simulate_with_alpha</span><span class="p">(</span><span class="n">alpha_value</span><span class="p">):</span>
+        <span class="n">alpha_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">alpha_value</span><span class="p">)</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="n">simulate_network_evolution</span><span class="p">(</span>
+            <span class="n">distance_matrix</span><span class="o">=</span><span class="n">distance_matrix</span><span class="p">,</span>
+            <span class="n">n_iterations</span><span class="o">=</span><span class="n">n_iterations</span><span class="p">,</span>
+            <span class="n">distance_fn</span><span class="o">=</span><span class="n">distance_fn</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha_vec</span><span class="p">,</span>
+            <span class="n">beta</span><span class="o">=</span><span class="n">beta_vec</span><span class="p">,</span>
+            <span class="n">connectivity_penalty</span><span class="o">=</span><span class="n">penalty_vec</span><span class="p">,</span>
+            <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+            <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size_vec</span><span class="p">,</span>
+            <span class="n">symmetric</span><span class="o">=</span><span class="n">symmetric</span><span class="p">,</span>
+            <span class="n">payoff_tolerance</span><span class="o">=</span><span class="n">tolerance_vec</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Get final network</span>
+        <span class="n">final_adj</span> <span class="o">=</span> <span class="n">network</span><span class="p">[:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">final_adj</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_nodes</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_nodes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        
+        <span class="k">return</span> <span class="n">density</span><span class="p">,</span> <span class="n">network</span>
+    
+    <span class="c1"># Initialize search with provided range</span>
+    <span class="n">alpha_min</span><span class="p">,</span> <span class="n">alpha_max</span> <span class="o">=</span> <span class="n">alpha_range</span>
+    <span class="n">min_density</span><span class="p">,</span> <span class="n">min_net</span> <span class="o">=</span> <span class="n">simulate_with_alpha</span><span class="p">(</span><span class="n">alpha_min</span><span class="p">)</span>
+    <span class="n">max_density</span><span class="p">,</span> <span class="n">max_net</span> <span class="o">=</span> <span class="n">simulate_with_alpha</span><span class="p">(</span><span class="n">alpha_max</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initial range: alpha=[</span><span class="si">{</span><span class="n">alpha_min</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">alpha_max</span><span class="si">}</span><span class="s2">], density=[</span><span class="si">{</span><span class="n">min_density</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">max_density</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Target density: </span><span class="si">{</span><span class="n">empirical_density</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Track all tested points</span>
+    <span class="n">tested_points</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha_min</span><span class="p">,</span> <span class="s1">&#39;density&#39;</span><span class="p">:</span> <span class="n">min_density</span><span class="p">,</span> <span class="s1">&#39;evolution&#39;</span><span class="p">:</span> <span class="n">min_net</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha_max</span><span class="p">,</span> <span class="s1">&#39;density&#39;</span><span class="p">:</span> <span class="n">max_density</span><span class="p">,</span> <span class="s1">&#39;evolution&#39;</span><span class="p">:</span> <span class="n">max_net</span><span class="p">}</span>
+    <span class="p">]</span>
+    
+    <span class="c1"># Check if range brackets the target</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">min_density</span> <span class="o">&gt;</span> <span class="n">empirical_density</span> <span class="ow">and</span> <span class="n">max_density</span> <span class="o">&gt;</span> <span class="n">empirical_density</span><span class="p">)</span> <span class="ow">or</span> \
+       <span class="p">(</span><span class="n">min_density</span> <span class="o">&lt;</span> <span class="n">empirical_density</span> <span class="ow">and</span> <span class="n">max_density</span> <span class="o">&lt;</span> <span class="n">empirical_density</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: Initial range does not bracket the target density!&quot;</span><span class="p">)</span>
+        <span class="c1"># Return best of the two</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">tested_points</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;density&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">empirical_density</span><span class="p">))</span>
+    
+    <span class="c1"># Bisection search with linear interpolation</span>
+    <span class="n">iterations</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">iterations</span> <span class="o">&lt;</span> <span class="n">max_search_iterations</span><span class="p">:</span>
+        <span class="c1"># Use linear interpolation to estimate next alpha</span>
+        <span class="n">alpha_mid</span> <span class="o">=</span> <span class="n">alpha_min</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha_max</span> <span class="o">-</span> <span class="n">alpha_min</span><span class="p">)</span> <span class="o">*</span> \
+                    <span class="p">(</span><span class="n">empirical_density</span> <span class="o">-</span> <span class="n">min_density</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_density</span> <span class="o">-</span> <span class="n">min_density</span><span class="p">)</span>
+        
+        <span class="c1"># Fallback to bisection if interpolation gives unusual values</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">alpha_min</span> <span class="o">&lt;</span> <span class="n">alpha_mid</span> <span class="o">&lt;</span> <span class="n">alpha_max</span><span class="p">):</span>
+            <span class="n">alpha_mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha_min</span> <span class="o">+</span> <span class="n">alpha_max</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iteration </span><span class="si">{</span><span class="n">iterations</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">: Testing alpha=</span><span class="si">{</span><span class="n">alpha_mid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">mid_density</span><span class="p">,</span> <span class="n">mid_net</span> <span class="o">=</span> <span class="n">simulate_with_alpha</span><span class="p">(</span><span class="n">alpha_mid</span><span class="p">)</span>
+        <span class="n">tested_points</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha_mid</span><span class="p">,</span> <span class="s1">&#39;density&#39;</span><span class="p">:</span> <span class="n">mid_density</span><span class="p">,</span> <span class="s1">&#39;evolution&#39;</span><span class="p">:</span> <span class="n">mid_net</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Alpha=</span><span class="si">{</span><span class="n">alpha_mid</span><span class="si">}</span><span class="s2"> → density=</span><span class="si">{</span><span class="n">mid_density</span><span class="si">}</span><span class="s2">, diff from target=</span><span class="si">{</span><span class="n">mid_density</span><span class="o">-</span><span class="n">empirical_density</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Check if we&#39;re close enough</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">mid_density</span> <span class="o">-</span> <span class="n">empirical_density</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha_mid</span><span class="p">,</span> <span class="s1">&#39;density&#39;</span><span class="p">:</span> <span class="n">mid_density</span><span class="p">,</span> <span class="s1">&#39;evolution&#39;</span><span class="p">:</span> <span class="n">mid_net</span><span class="p">}</span>
+        
+        <span class="c1"># Update range</span>
+        <span class="k">if</span> <span class="n">mid_density</span> <span class="o">&lt;</span> <span class="n">empirical_density</span><span class="p">:</span>
+            <span class="n">alpha_min</span> <span class="o">=</span> <span class="n">alpha_mid</span>
+            <span class="n">min_density</span> <span class="o">=</span> <span class="n">mid_density</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alpha_max</span> <span class="o">=</span> <span class="n">alpha_mid</span>
+            <span class="n">max_density</span> <span class="o">=</span> <span class="n">mid_density</span>
+        
+        <span class="c1"># Check if range is small enough</span>
+        <span class="k">if</span> <span class="n">alpha_max</span> <span class="o">-</span> <span class="n">alpha_min</span> <span class="o">&lt;</span> <span class="n">tolerance</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">tested_points</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;density&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">empirical_density</span><span class="p">))</span>
+        
+        <span class="n">iterations</span> <span class="o">+=</span> <span class="mi">1</span>
+    
+    <span class="c1"># If we reach max iterations, return best point found</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">tested_points</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;density&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">empirical_density</span><span class="p">))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Kayson Fakhar, Shrey Dixit.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

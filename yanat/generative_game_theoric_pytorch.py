@@ -9,7 +9,9 @@ __all__ = [
     "resistance_distance_pt",
     "heat_kernel_distance_pt",
     "simulate_network_evolution_gradient_pytorch",
+    "simulate_network_evolution_differentiable",
     "find_optimal_alpha_pt",
+    "find_optimal_alpha_differentiable",
 ]
 
 # -----------------------------------------------------------------------------
@@ -208,109 +210,34 @@ def simulate_network_evolution_gradient_pytorch(
             loss = -payoff
             loss.backward()
         elif optimization_type == "nodal":
-            # For nodal optimization, we need to compute gradients for each node's payoff
-            # independently. Specifically, node i only controls row i of the adjacency matrix.
-            # So we want grad_i = d(Payoff_i) / d(Adjacency_i).
+            # Optimized implementation using torch.func.jacrev for parallel Jacobian computation
+            # This avoids the slow loop over N nodes with N backward passes.
             
-            # We can accumulate gradients manually.
-            # Warning: This is computationally expensive (N backward passes).
-            # Optimization: We can use torch.autograd.grad or backward with a mask, 
-            # but since Payoff_i depends on the whole matrix (due to distance calc),
-            # we effectively have N separate loss functions.
+            # Define functional wrapper for payoff calculation
+            def functional_payoff(adj):
+                return _calculate_payoff_pytorch(
+                    adj, 
+                    dist_matrix_tensor, 
+                    a_t, 
+                    b_t, 
+                    dist_fn_callable, 
+                    optimization_type="nodal",
+                    **kwargs
+                )
             
-            # However, notice that if we just sum the payoffs and backward, 
-            # d(Sum Payoff_i) / d(A_jk) = sum_i d(Payoff_i) / d(A_jk).
-            # This is NOT what we want. We want node k to update A_kj based ONLY on Payoff_k.
-            # i.e., the gradient for A_kj should be d(Payoff_k) / d(A_kj).
-            # (Assuming undirected, A_kj = A_jk, so both nodes update the link).
+            # Compute Jacobian: shape (N_payoff, N_adj_rows, N_adj_cols)
+            # jac[i, j, k] = d(Payoff_i) / d(A_jk)
+            jac = torch.func.jacrev(functional_payoff)(adjacency)
             
-            # Actually, in a game theoretic sense for undirected graphs:
-            # If node i wants to change A_ij, it optimizes Payoff_i.
-            # If node j wants to change A_ji, it optimizes Payoff_j.
-            # Since A_ij = A_ji, this is a cooperative or non-cooperative game.
-            # Standard "gradient dynamics" usually implies:
-            # dA_ij/dt = d(Payoff_i)/dA_ij + d(Payoff_j)/dA_ji
-            # This is equivalent to optimizing the potential function if one exists.
-            # But here we want strictly nodal gradients.
+            # We want total_grad[i, k] = d(Payoff_i) / d(A_ik)
+            # This corresponds to the diagonal elements jac[i, i, k]
+            # torch.diagonal(jac, dim1=0, dim2=1) gives shape (N_cols, N_nodes) -> (k, i)
+            # So we transpose to get (i, k)
+            total_grad = torch.diagonal(jac, dim1=0, dim2=1).T
             
-            # Let's implement the strict definition:
-            # Gradient for A_ij comes from Node i's desire (dPi/dAij) AND Node j's desire (dPj/dAji).
-            # So we can actually just sum the payoffs?
-            # If we sum P = sum(P_i), then dP/dA_ij = sum_k dP_k/dA_ij.
-            # This includes "externalities" (how my link affects others).
-            # Pure selfish agents DO NOT care about externalities.
-            # So A_ij should update by dP_i/dA_ij + dP_j/dA_ji.
-            # It should NOT include dP_k/dA_ij for k != i, j.
-            
-            # So we cannot just backward sum(payoff).
-            # We need to compute the Jacobian or do N backward passes.
-            # Given N might be large, N backward passes is slow.
-            # But let's do it for correctness first as requested.
-            
-            # To speed this up, we can use a hook or Jacobian-vector product, 
-            # but let's stick to the loop for clarity and correctness first.
-            
-            # Actually, we can do it in one pass if we are clever?
-            # No, because the dependency is complex (matrix inversion).
-            
-            total_grad = torch.zeros_like(adjacency)
-            
-            # Iterate over nodes to compute selfish gradients
-            for i in range(n_nodes):
-                # We only need the gradient of Payoff_i w.r.t Adjacency
-                # We can retain_graph=True for all but the last one.
-                
-                # Optimization: We only care about row i (and col i due to symmetry).
-                # But dP_i/dA_jk might be non-zero for k!=i (indirect effects).
-                # But node i cannot control A_jk. Node i only controls A_i*.
-                # So we only accumulate gradients into row i.
-                
-                # To avoid N full backward passes, maybe we can use vmap in newer pytorch?
-                # For now, standard loop.
-                
-                grad_i = torch.autograd.grad(
-                    payoff[i], 
-                    adjacency, 
-                    retain_graph=True, 
-                    create_graph=False
-                )[0]
-                
-                # Node i controls row i.
-                # In undirected case, A_ij is shared. 
-                # Usually we assume A_ij is controlled by both? 
-                # Or we update A_ij based on dP_i/dA_ij + dP_j/dA_ji.
-                
-                # Let's add the contribution of node i to the gradient of row i.
-                total_grad[i, :] += grad_i[i, :]
-                
-                # If symmetric, A_ji is the same variable as A_ij.
-                # If we treat A as a symmetric matrix variable, 
-                # then dP_i / dA_ij contributes to the update of that unique edge.
-                
-                # If we treat A as full matrix enforced symmetric later:
-                # Node i pushes A_ij with force dP_i/dA_ij.
-                # Node j pushes A_ji with force dP_j/dA_ji.
-                # Since A_ij and A_ji are coupled (or will be symmetrized), 
-                # we effectively sum these forces.
-                
-                # So: total_grad[i, :] += grad_i[i, :] is correct for the "row player" perspective.
-                # And since we iterate all i, total_grad[j, :] will get added dP_j/dA_ji.
-                # Finally we symmetrize the gradient or the matrix.
-                
-            adjacency.grad = -total_grad # We want to MAXIMIZE payoff, so gradient ascent. 
-                                         # Optimizer minimizes, so we use negative gradient.
-                                         # (Or passed negative payoff? No, payoff is positive utility usually.
-                                         # Wait, earlier I defined payoff = -cost.
-                                         # So we want to MAXIMIZE payoff (minimize cost).
-                                         # SGD minimizes. So we want to minimize (-payoff).
-                                         # Gradient of (-payoff) is -(gradient of payoff).
-                                         # So adjacency.grad should be -total_grad.
+            adjacency.grad = -total_grad
             
             optimizer.step()
-            
-            # Clean up graph
-            # (Not needed explicitly as we didn't create graph for optimizer step, 
-            # and we re-compute forward next iter)
 
         with torch.no_grad():
             adjacency.fill_diagonal_(0)
@@ -443,3 +370,230 @@ def find_optimal_alpha_pt(
         print(f"Max iterations reached. Best alpha found: {best_result['alpha']:.4f} with density {best_result['density']:.4f}")
         
     return best_result
+
+def simulate_network_evolution_differentiable(
+    distance_matrix: torch.Tensor,
+    n_iterations: int,
+    alpha: torch.Tensor,
+    beta: torch.Tensor,
+    distance_fn: Callable,
+    learning_rate: float = 0.01,
+    initial_adjacency: Optional[torch.Tensor] = None,
+    symmetric: bool = True,
+    optimization_type: str = "global",
+    optimizer_type: str = "sgd",
+    **kwargs
+) -> torch.Tensor:
+    """
+    Differentiable simulation of network evolution.
+    Returns the final adjacency matrix as a tensor with grad history.
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    if initial_adjacency is None:
+        adj = torch.zeros((n_nodes, n_nodes), dtype=torch.float64, device=distance_matrix.device)
+        idx = torch.arange(n_nodes, device=distance_matrix.device)
+        adj[idx, (idx + 1) % n_nodes] = 1.0
+        adj[(idx + 1) % n_nodes, idx] = 1.0
+    else:
+        adj = initial_adjacency.clone()
+        
+    adj.requires_grad_(True)
+    current_adj = adj
+    
+    # We can't easily use torch.optim.Optimizer inside the loop if we want to differentiate through the *entire* path 
+    # w.r.t alpha, because standard optimizers do in-place updates which might break the graph or be tricky.
+    # However, for simple SGD/Adam, we can write the update rule manually to ensure graph connectivity.
+    # For SGD: theta_new = theta - lr * grad
+    # For Adam: we need to track moments. This is complex to do manually and differentiably w.r.t alpha if alpha affects the gradients.
+    # Actually, alpha affects the gradients.
+    # If we use SGD, it's fine.
+    # If we want Adam for the network, we need to implement functional Adam or use a library like `torchopt` or `higher`.
+    # Given the constraints, let's stick to SGD for the network evolution for now, as it's robust and simple for this inner loop.
+    # We will just allow changing the learning rate.
+    
+    # But the user asked for "adam or stochastic gd".
+    # If they meant for the ALPHA optimization, we are already using Adam.
+    # If they meant for the NETWORK optimization, maybe they want momentum?
+    
+    # Let's stick to SGD for network evolution but allow momentum if requested (manually implemented).
+    momentum = kwargs.get('momentum', 0.0)
+    velocity = torch.zeros_like(current_adj) if momentum > 0 else None
+
+    for _ in range(n_iterations):
+        payoff = _calculate_payoff_pytorch(
+            current_adj, 
+            distance_matrix, 
+            alpha, 
+            beta, 
+            distance_fn, 
+            optimization_type=optimization_type,
+            **kwargs
+        )
+        
+        if optimization_type == "global":
+            loss = -payoff
+            grads = torch.autograd.grad(loss, current_adj, create_graph=True)[0]
+        elif optimization_type == "nodal":
+            def functional_payoff(a):
+                return _calculate_payoff_pytorch(
+                    a, 
+                    distance_matrix, 
+                    alpha, 
+                    beta, 
+                    distance_fn, 
+                    optimization_type="nodal",
+                    **kwargs
+                )
+            jac = torch.func.jacrev(functional_payoff)(current_adj)
+            total_grad = torch.diagonal(jac, dim1=0, dim2=1).T
+            grads = -total_grad
+            
+        if momentum > 0 and velocity is not None:
+            velocity = momentum * velocity + grads
+            update = velocity
+        else:
+            update = grads
+
+        current_adj = current_adj - learning_rate * update
+        
+        if symmetric:
+            current_adj = (current_adj + current_adj.T) / 2.0
+            
+        current_adj = torch.clamp(current_adj, 0, 1)
+        current_adj = current_adj * (1 - torch.eye(n_nodes, device=current_adj.device))
+        
+    return current_adj
+
+def find_optimal_alpha_differentiable(
+    distance_matrix: np.ndarray,
+    empirical_connectivity: np.ndarray,
+    distance_fn: Union[str, Callable],
+    n_iterations: int = 2000,
+    beta: float = 1.0,
+    initial_alpha: float = 1.0,
+    learning_rate_alpha: float = 0.1,
+    learning_rate_network: float = 0.01,
+    alpha_search_iterations: int = 50,
+    symmetric: bool = True,
+    verbose: bool = True,
+    optimization_type: str = "global",
+    metric: str = "density",
+    optimizer_class: str = "adam",
+    stochastic: bool = False,
+    **kwargs
+) -> Dict[str, Any]:
+    """
+    Finds optimal alpha using gradient descent on the simulation output.
+    
+    Args:
+        metric: "density" or "mse".
+        optimizer_class: "adam" or "sgd".
+        stochastic: If True, uses random initial adjacency for each step to avoid local minima.
+    """
+    if torch is None:
+        raise ImportError("PyTorch is not installed.")
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    n_nodes = empirical_connectivity.shape[0]
+    target_density = np.sum(empirical_connectivity != 0) / (n_nodes * (n_nodes - 1))
+    
+    dist_matrix_tensor = torch.tensor(distance_matrix, device=device, dtype=torch.float64)
+    target_adj_tensor = torch.tensor(empirical_connectivity, device=device, dtype=torch.float64)
+    
+    # Resolve distance function
+    if isinstance(distance_fn, str):
+        if "resistance" in distance_fn:
+            dist_fn_callable = resistance_distance_pt
+        elif "heat" in distance_fn:
+            def heat_dist_stable(adj, t=0.5, **kwargs):
+                degree = torch.sum(adj, dim=1)
+                L = torch.diag(degree) - adj
+                kernel = torch.matrix_exp(-t * L)
+                return -torch.log(kernel + 1e-10)
+            dist_fn_callable = partial(heat_dist_stable, t=kwargs.get('t', 0.5))
+        else:
+            raise ValueError(f"Unknown distance function: {distance_fn}")
+    else:
+        dist_fn_callable = distance_fn
+
+    alpha_param = torch.tensor(initial_alpha, device=device, dtype=torch.float64, requires_grad=True)
+    beta_tensor = torch.tensor(beta, device=device, dtype=torch.float64)
+    
+    if optimizer_class.lower() == "adam":
+        optimizer_alpha = torch.optim.Adam([alpha_param], lr=learning_rate_alpha)
+    elif optimizer_class.lower() == "sgd":
+        optimizer_alpha = torch.optim.SGD([alpha_param], lr=learning_rate_alpha)
+    else:
+        raise ValueError(f"Unknown optimizer: {optimizer_class}")
+    
+    history = []
+    
+    iterator = tqdm(range(alpha_search_iterations), desc="Optimizing Alpha", disable=not verbose)
+    
+    for i in iterator:
+        optimizer_alpha.zero_grad()
+        
+        if stochastic:
+            # Random initialization
+            # Create a random symmetric matrix with values in [0, 1]
+            rand_adj = torch.rand((n_nodes, n_nodes), device=device, dtype=torch.float64)
+            rand_adj = (rand_adj + rand_adj.T) / 2.0
+            rand_adj.fill_diagonal_(0)
+            initial_adj = rand_adj
+        else:
+            initial_adj = None
+
+        final_adj = simulate_network_evolution_differentiable(
+            dist_matrix_tensor,
+            n_iterations,
+            alpha_param,
+            beta_tensor,
+            dist_fn_callable,
+            learning_rate=learning_rate_network,
+            symmetric=symmetric,
+            optimization_type=optimization_type,
+            initial_adjacency=initial_adj,
+            **kwargs
+        )
+        
+        current_density = torch.sum(final_adj) / (n_nodes * (n_nodes - 1))
+        
+        if metric == "density":
+            loss = (current_density - target_density) ** 2
+        elif metric == "mse":
+            loss = torch.nn.functional.mse_loss(final_adj, target_adj_tensor)
+        else:
+            raise ValueError(f"Unknown metric: {metric}")
+        
+        loss.backward()
+        optimizer_alpha.step()
+        
+        # Enforce alpha > 0
+        with torch.no_grad():
+            alpha_param.clamp_(min=0.001)
+            
+        if verbose:
+            iterator.set_postfix({
+                "alpha": f"{alpha_param.item():.4f}", 
+                "density": f"{current_density.item():.4f}", 
+                "loss": f"{loss.item():.6f}"
+            })
+            
+        history.append({
+            'alpha': alpha_param.item(),
+            'density': current_density.item(),
+            'loss': loss.item()
+        })
+        
+        if loss.item() < 1e-8:
+            break
+            
+    return {
+        'alpha': alpha_param.item(),
+        'density': history[-1]['density'],
+        'history': history,
+        'final_adjacency': final_adj.detach().cpu().numpy()
+    }
+

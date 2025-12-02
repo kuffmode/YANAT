@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yanat.generative_game_theoric &mdash; YANAT 0.1.4 documentation</title>
+  <title>yanat.generative_game_theoric &mdash; YANAT 0.1.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fd825880"></script>
+      <script src="../../_static/documentation_options.js?v=59fadc99"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -72,7 +72,7 @@
              
   <h1>Source code for yanat.generative_game_theoric</h1><div class="highlight"><pre>
 <span></span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
@@ -84,7 +84,7 @@
 <span class="n">numba</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">DISABLE_JIT_WARNINGS</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="n">FloatArray</span> <span class="o">=</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="n">Trajectory</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">]</span>
+<span class="n">Trajectory</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">]</span>
 <span class="n">DistanceMetric</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">],</span> <span class="n">FloatArray</span><span class="p">]</span>
 <span class="n">NoiseType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">FloatArray</span><span class="p">]</span>
 
@@ -127,7 +127,9 @@
     <span class="n">names</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
     <span class="n">allow_float</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
     <span class="n">allow_zero</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-    <span class="n">allow_none</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">allow_none</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_nodes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">allow_2d</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validates simulation parameters to ensure they are of correct type and shape.</span>
@@ -142,6 +144,8 @@
 <span class="sd">        allow_float: A tuple of booleans indicating if a parameter can be a scalar float.</span>
 <span class="sd">        allow_zero: A tuple of booleans indicating if a parameter can be zero.</span>
 <span class="sd">        allow_none: A tuple of booleans indicating if a parameter can be None.</span>
+<span class="sd">        n_nodes: The number of nodes in the network (required for 2D validation).</span>
+<span class="sd">        allow_2d: A tuple of booleans indicating if a parameter can be a 2D array (sim_length, n_nodes).</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If any parameter does not meet the specified criteria (type, shape, value).</span>
@@ -156,8 +160,10 @@
 <span class="sd">        ... )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">none_ok</span> <span class="o">=</span> <span class="n">allow_none</span> <span class="k">if</span> <span class="n">allow_none</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="kc">False</span><span class="p">,)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">trajectories</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">traj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">float_ok</span><span class="p">,</span> <span class="n">zero_ok</span><span class="p">,</span> <span class="n">none_ok</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-        <span class="n">trajectories</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">allow_float</span><span class="p">,</span> <span class="n">allow_zero</span><span class="p">,</span> <span class="n">none_ok</span>
+    <span class="n">two_d_ok</span> <span class="o">=</span> <span class="n">allow_2d</span> <span class="k">if</span> <span class="n">allow_2d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="kc">False</span><span class="p">,)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">trajectories</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">traj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">float_ok</span><span class="p">,</span> <span class="n">zero_ok</span><span class="p">,</span> <span class="n">none_ok</span><span class="p">,</span> <span class="n">is_2d_ok</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">trajectories</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">allow_float</span><span class="p">,</span> <span class="n">allow_zero</span><span class="p">,</span> <span class="n">none_ok</span><span class="p">,</span> <span class="n">two_d_ok</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">none_ok</span> <span class="ow">and</span> <span class="n">traj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
@@ -169,11 +175,26 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">zero_ok</span> <span class="ow">and</span> <span class="n">traj</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> cannot be zero&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">traj</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">sim_length</span><span class="p">,):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> trajectory length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span><span class="si">}</span><span class="s2"> doesn&#39;t match &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;simulation length </span><span class="si">{</span><span class="n">sim_length</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">traj</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">traj</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">sim_length</span><span class="p">,):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> trajectory length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span><span class="si">}</span><span class="s2"> doesn&#39;t match &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;simulation length </span><span class="si">{</span><span class="n">sim_length</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">traj</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_2d_ok</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> cannot be 2D&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">n_nodes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_nodes must be provided to validate 2D </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># Expecting (sim_length, n_nodes)</span>
+                <span class="k">if</span> <span class="n">traj</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">sim_length</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> 2D shape </span><span class="si">{</span><span class="n">traj</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> doesn&#39;t match &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;(sim_length, n_nodes) = (</span><span class="si">{</span><span class="n">sim_length</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">n_nodes</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has invalid dimensions </span><span class="si">{</span><span class="n">traj</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
             <span class="k">if</span> <span class="ow">not</span> <span class="n">zero_ok</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">traj</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> cannot contain zeros&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -185,12 +206,13 @@
 
 <div class="viewcode-block" id="get_param_value">
 <a class="viewcode-back" href="../../yanat.html#yanat.generative_game_theoric.get_param_value">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_param_value</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="n">Trajectory</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_param_value</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="n">Trajectory</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieves the value of a parameter at a specific time step `t`.</span>
 
 <span class="sd">    If the parameter is a scalar, it returns the scalar.</span>
-<span class="sd">    If it is an array (trajectory), it returns the value at index `t`.</span>
+<span class="sd">    If it is a 1D array (trajectory), it returns the value at index `t`.</span>
+<span class="sd">    If it is a 2D array (n_iterations, n_nodes), it returns the row at index `t`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        param: The parameter, either a float or a numpy array.</span>
@@ -588,7 +610,9 @@
         <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">connectivity_penalty</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">payoff_tolerance</span><span class="p">,</span>
         <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;connectivity_penalty&#39;</span><span class="p">,</span> <span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="s1">&#39;payoff_tolerance&#39;</span><span class="p">),</span>
         <span class="n">allow_float</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
-        <span class="n">allow_zero</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">allow_zero</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+        <span class="n">n_nodes</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">),</span>
+        <span class="n">allow_2d</span><span class="o">=</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
     <span class="p">)</span>
     
     <span class="n">distance_fn_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;distance_fn_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
@@ -648,7 +672,12 @@
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">diff_i</span><span class="p">,</span> <span class="n">diff_j</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
                 <span class="c1"># Check if change is beneficial</span>
                 <span class="c1"># We require at least one node to benefit (unilateral consent)</span>
-                <span class="k">if</span> <span class="n">diff_i</span> <span class="o">&gt;</span> <span class="n">tolerance_t</span> <span class="ow">or</span> <span class="n">diff_j</span> <span class="o">&gt;</span> <span class="n">tolerance_t</span><span class="p">:</span>
+                
+                <span class="c1"># Handle tolerance (scalar or array)</span>
+                <span class="n">tol_i</span> <span class="o">=</span> <span class="n">tolerance_t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tolerance_t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">else</span> <span class="n">tolerance_t</span>
+                <span class="n">tol_j</span> <span class="o">=</span> <span class="n">tolerance_t</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tolerance_t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">else</span> <span class="n">tolerance_t</span>
+                
+                <span class="k">if</span> <span class="n">diff_i</span> <span class="o">&gt;</span> <span class="n">tol_i</span> <span class="ow">or</span> <span class="n">diff_j</span> <span class="o">&gt;</span> <span class="n">tol_j</span><span class="p">:</span>
                     <span class="c1"># Flip edge</span>
                     <span class="n">val</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">adjacency</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
                     <span class="n">adjacency</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
@@ -895,7 +924,7 @@
     <span class="n">beta_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
     <span class="n">penalty_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">connectivity_penalty</span><span class="p">)</span>
     <span class="n">batch_size_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
-    <span class="n">tolerance_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">payoff_tolerance</span><span class="p">)</span>
+    <span class="n">batch_size_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_iterations</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
     
     <span class="c1"># Function to simulate network and get density</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">simulate_with_alpha</span><span class="p">(</span><span class="n">alpha_value</span><span class="p">):</span>
@@ -911,7 +940,7 @@
             <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size_vec</span><span class="p">,</span>
             <span class="n">symmetric</span><span class="o">=</span><span class="n">symmetric</span><span class="p">,</span>
-            <span class="n">payoff_tolerance</span><span class="o">=</span><span class="n">tolerance_vec</span><span class="p">,</span>
+            <span class="n">payoff_tolerance</span><span class="o">=</span><span class="n">payoff_tolerance</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
         

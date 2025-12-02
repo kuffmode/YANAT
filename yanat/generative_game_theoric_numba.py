@@ -2,6 +2,7 @@
 import numpy as np
 import numba as nb
 from numba import njit, prange
+from numba.extending import overload
 from typing import Optional, Tuple, Union, Callable, Dict, Any, List
 from tqdm import tqdm
 
@@ -114,6 +115,16 @@ def _get_component_size(adjacency: np.ndarray, node: int) -> int:
                 tail += 1
                 
     return count
+
+def get_tolerance(tolerance, index):
+    pass
+
+@overload(get_tolerance)
+def ol_get_tolerance(tolerance, index):
+    if isinstance(tolerance, nb.types.Array):
+        return lambda tolerance, index: tolerance[index]
+    else:
+        return lambda tolerance, index: tolerance
 
 # -----------------------------------------------------------------------------
 # Distance Functions
@@ -451,7 +462,7 @@ def _evaluate_candidates_batch(
     symmetric: bool,
     weight_coefficient: float,
     t_param: float,
-    tolerance: float
+    tolerance: Union[float, np.ndarray]
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     
     n_candidates = len(candidates_u)
@@ -521,7 +532,10 @@ def _evaluate_candidates_batch(
         diff_u = new_payoff_u - current_payoffs[u]
         diff_v = new_payoff_v - current_payoffs[v]
         
-        if diff_u > tolerance or diff_v > tolerance:
+        tol_u = get_tolerance(tolerance, u)
+        tol_v = get_tolerance(tolerance, v)
+        
+        if diff_u > tol_u or diff_v > tol_v:
             is_beneficial[k] = True
             
     return candidates_u, candidates_v, is_beneficial
@@ -858,7 +872,6 @@ def find_optimal_alpha(
     beta_vec = np.full(n_iterations, beta)
     penalty_vec = np.full(n_iterations, connectivity_penalty)
     batch_size_vec = np.full(n_iterations, batch_size)
-    tolerance_vec = np.full(n_iterations, payoff_tolerance)
     
     # Function to simulate network and get density
     def simulate_with_alpha(alpha_value):
@@ -874,7 +887,7 @@ def find_optimal_alpha(
             random_seed=random_seed,
             batch_size=batch_size_vec,
             symmetric=symmetric,
-            payoff_tolerance=tolerance_vec,
+            payoff_tolerance=payoff_tolerance,
             verbose=verbose,
             **kwargs
         )

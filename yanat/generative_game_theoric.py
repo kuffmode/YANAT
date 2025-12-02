@@ -1,5 +1,5 @@
 
-from typing import Any, Callable, Dict, Union, Literal, TypeAlias, Optional
+from typing import Any, Callable, Dict, Union, Literal, Optional
 import numpy as np
 import numba
 import numpy.typing as npt
@@ -11,7 +11,7 @@ from scipy.spatial.distance import pdist, squareform
 numba.config.DISABLE_JIT_WARNINGS = 1
 
 FloatArray = npt.NDArray[np.float64]
-Trajectory: TypeAlias = Union[float, FloatArray]
+Trajectory = Union[float, FloatArray]
 DistanceMetric = Callable[[FloatArray, FloatArray], FloatArray]
 NoiseType = Union[Literal[0], FloatArray]
 
@@ -52,7 +52,9 @@ def validate_parameters(
     names: tuple[str, ...],
     allow_float: tuple[bool, ...],
     allow_zero: tuple[bool, ...],
-    allow_none: Optional[tuple[bool, ...]] = None
+    allow_none: Optional[tuple[bool, ...]] = None,
+    n_nodes: Optional[int] = None,
+    allow_2d: Optional[tuple[bool, ...]] = None
 ) -> None:
     """
     Validates simulation parameters to ensure they are of correct type and shape.
@@ -67,6 +69,8 @@ def validate_parameters(
         allow_float: A tuple of booleans indicating if a parameter can be a scalar float.
         allow_zero: A tuple of booleans indicating if a parameter can be zero.
         allow_none: A tuple of booleans indicating if a parameter can be None.
+        n_nodes: The number of nodes in the network (required for 2D validation).
+        allow_2d: A tuple of booleans indicating if a parameter can be a 2D array (sim_length, n_nodes).
 
     Raises:
         ValueError: If any parameter does not meet the specified criteria (type, shape, value).
@@ -81,8 +85,10 @@ def validate_parameters(
         ... )
     """
     none_ok = allow_none if allow_none is not None else (False,) * len(trajectories)
-    for traj, name, float_ok, zero_ok, none_ok in zip(
-        trajectories, names, allow_float, allow_zero, none_ok
+    two_d_ok = allow_2d if allow_2d is not None else (False,) * len(trajectories)
+    
+    for traj, name, float_ok, zero_ok, none_ok, is_2d_ok in zip(
+        trajectories, names, allow_float, allow_zero, none_ok, two_d_ok
     ):
         if none_ok and traj is None:
             continue
@@ -94,11 +100,26 @@ def validate_parameters(
             if not zero_ok and traj == 0:
                 raise ValueError(f"{name} cannot be zero")
         elif isinstance(traj, np.ndarray):
-            if traj.shape != (sim_length,):
-                raise ValueError(
-                    f"{name} trajectory length {len(traj)} doesn't match "
-                    f"simulation length {sim_length}"
-                )
+            if traj.ndim == 1:
+                if traj.shape != (sim_length,):
+                    raise ValueError(
+                        f"{name} trajectory length {len(traj)} doesn't match "
+                        f"simulation length {sim_length}"
+                    )
+            elif traj.ndim == 2:
+                if not is_2d_ok:
+                    raise ValueError(f"{name} cannot be 2D")
+                if n_nodes is None:
+                    raise ValueError(f"n_nodes must be provided to validate 2D {name}")
+                # Expecting (sim_length, n_nodes)
+                if traj.shape != (sim_length, n_nodes):
+                    raise ValueError(
+                        f"{name} 2D shape {traj.shape} doesn't match "
+                        f"(sim_length, n_nodes) = ({sim_length}, {n_nodes})"
+                    )
+            else:
+                raise ValueError(f"{name} has invalid dimensions {traj.ndim}")
+                
             if not zero_ok and np.any(traj == 0):
                 raise ValueError(f"{name} cannot contain zeros")
         else:
@@ -107,12 +128,13 @@ def validate_parameters(
             )
 
 
-def get_param_value(param: Trajectory, t: int) -> float:
+def get_param_value(param: Trajectory, t: int) -> Union[float, FloatArray]:
     """
     Retrieves the value of a parameter at a specific time step `t`.
 
     If the parameter is a scalar, it returns the scalar.
-    If it is an array (trajectory), it returns the value at index `t`.
+    If it is a 1D array (trajectory), it returns the value at index `t`.
+    If it is a 2D array (n_iterations, n_nodes), it returns the row at index `t`.
 
     Args:
         param: The parameter, either a float or a numpy array.
@@ -486,7 +508,9 @@ def simulate_network_evolution(
         alpha, beta, connectivity_penalty, batch_size, payoff_tolerance,
         names=('alpha', 'beta', 'connectivity_penalty', 'batch_size', 'payoff_tolerance'),
         allow_float=(True, True, True, True, True),
-        allow_zero=(True, True, True, False, True)
+        allow_zero=(True, True, True, False, True),
+        n_nodes=len(distance_matrix),
+        allow_2d=(False, False, False, False, True)
     )
     
     distance_fn_kwargs = kwargs.get('distance_fn_kwargs', {})
@@ -546,7 +570,12 @@ def simulate_network_evolution(
             for idx, (i, j, diff_i, diff_j) in enumerate(results):
                 # Check if change is beneficial
                 # We require at least one node to benefit (unilateral consent)
-                if diff_i > tolerance_t or diff_j > tolerance_t:
+                
+                # Handle tolerance (scalar or array)
+                tol_i = tolerance_t[i] if isinstance(tolerance_t, np.ndarray) else tolerance_t
+                tol_j = tolerance_t[j] if isinstance(tolerance_t, np.ndarray) else tolerance_t
+                
+                if diff_i > tol_i or diff_j > tol_j:
                     # Flip edge
                     val = 1.0 - adjacency[i, j]
                     adjacency[i, j] = val
@@ -787,7 +816,7 @@ def find_optimal_alpha(
     beta_vec = np.full(n_iterations, beta)
     penalty_vec = np.full(n_iterations, connectivity_penalty)
     batch_size_vec = np.full(n_iterations, batch_size)
-    tolerance_vec = np.full(n_iterations, payoff_tolerance)
+    batch_size_vec = np.full(n_iterations, batch_size)
     
     # Function to simulate network and get density
     def simulate_with_alpha(alpha_value):
@@ -803,7 +832,7 @@ def find_optimal_alpha(
             random_seed=random_seed,
             batch_size=batch_size_vec,
             symmetric=symmetric,
-            payoff_tolerance=tolerance_vec,
+            payoff_tolerance=payoff_tolerance,
             **kwargs
         )
         

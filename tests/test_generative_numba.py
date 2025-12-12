@@ -30,7 +30,8 @@ def test_numba_simulation_runs():
         verbose=False
     )
     assert history.shape == (n_nodes, n_nodes, n_iterations)
-    assert np.all(np.isin(history, [0, 1]))
+    assert np.all(history >= 0.0)
+    assert np.all(history <= 1.0)
 
 def test_distance_functions():
     n = 10

@@ -384,6 +384,7 @@ def compute_node_payoff(
     distance_fn_type: int, # 0: prop, 1: res, 2: heat, 3: sp, 4: topo
     alpha: float,
     beta: float,
+    gamma: float,
     connectivity_penalty: float,
     node_resources: Optional[np.ndarray],
     # Distance fn params
@@ -434,9 +435,9 @@ def compute_node_payoff(
     euclidean = distance_matrix[node]
     if node_resources is not None:
         effective_dist = np.maximum(0.0, euclidean - node_resources[node])
-        wiring_cost = np.sum(adjacency[node] * effective_dist)
+        wiring_cost = np.sum((adjacency[node] ** gamma) * effective_dist)
     else:
-        wiring_cost = np.sum(adjacency[node] * euclidean)
+        wiring_cost = np.sum((adjacency[node] ** gamma) * euclidean)
         
     payoff = - (alpha * comm_cost + beta * wiring_cost)
     
@@ -455,6 +456,7 @@ def _evaluate_candidates_batch(
     distance_matrix: np.ndarray,
     alpha: float,
     beta: float,
+    gamma: float,
     connectivity_penalty: float,
     node_resources: np.ndarray,
     distance_fn_type: int,
@@ -462,11 +464,15 @@ def _evaluate_candidates_batch(
     symmetric: bool,
     weight_coefficient: float,
     t_param: float,
-    tolerance: Union[float, np.ndarray]
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    tolerance: Union[float, np.ndarray],
+    binary_switching: bool,
+    sigma: float,
+    min_weight: float
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     
     n_candidates = len(candidates_u)
     is_beneficial = np.zeros(n_candidates, dtype=np.bool_)
+    proposed_weights = np.zeros(n_candidates, dtype=np.float64)
     n_nodes = len(current_adj)
     
     for k in prange(n_candidates):
@@ -475,10 +481,31 @@ def _evaluate_candidates_batch(
         
         # Copy adj
         cand_adj = current_adj.copy()
-        val = 1.0 - cand_adj[u, v]
-        cand_adj[u, v] = val
-        if symmetric:
-            cand_adj[v, u] = val
+        if binary_switching:
+            val = 1.0 - cand_adj[u, v]
+            cand_adj[u, v] = val
+            if symmetric:
+                cand_adj[v, u] = val
+            new_weight = val
+        else:
+            # Gaussian perturbation
+            current_weight = cand_adj[u, v]
+            perturbation = np.random.normal(0, sigma)
+            new_weight = current_weight + perturbation
+            
+            # Clamp
+            if new_weight > 1.0: new_weight = 1.0
+            if new_weight < 0.0: new_weight = 0.0
+            
+            # Prune
+            if new_weight < min_weight: new_weight = 0.0
+            
+            cand_adj[u, v] = new_weight
+            if symmetric:
+                cand_adj[v, u] = new_weight
+
+            
+        proposed_weights[k] = new_weight
             
         # Compute new payoffs for u and v
         payoff_u = 0.0
@@ -492,8 +519,8 @@ def _evaluate_candidates_batch(
             effective_dist_u = np.maximum(0.0, euclidean_u - node_resources[u])
             effective_dist_v = np.maximum(0.0, euclidean_v - node_resources[v])
             
-            wiring_u = np.sum(cand_adj[u] * effective_dist_u)
-            wiring_v = np.sum(cand_adj[v] * effective_dist_v)
+            wiring_u = np.sum((cand_adj[u] ** gamma) * effective_dist_u)
+            wiring_v = np.sum((cand_adj[v] ** gamma) * effective_dist_v)
             
             payoff_u -= beta * wiring_u
             payoff_v -= beta * wiring_v
@@ -538,7 +565,7 @@ def _evaluate_candidates_batch(
         if diff_u > tol_u or diff_v > tol_v:
             is_beneficial[k] = True
             
-    return candidates_u, candidates_v, is_beneficial
+    return candidates_u, candidates_v, is_beneficial, proposed_weights
 
 @njit(fastmath=True)
 def _compute_all_payoffs(
@@ -546,6 +573,7 @@ def _compute_all_payoffs(
     d_mat: np.ndarray, 
     a: float, 
     b: float, 
+    g: float,
     cp: float,
     node_res: np.ndarray,
     d_type: int, 
@@ -577,7 +605,7 @@ def _compute_all_payoffs(
         wiring = np.zeros(n, dtype=np.float64)
         for i in range(n):
             eff_dist = np.maximum(0.0, d_mat[i] - node_res[i])
-            wiring[i] = np.sum(adj[i] * eff_dist)
+            wiring[i] = np.sum((adj[i] ** g) * eff_dist)
         payoffs -= b * wiring
     
     if cp != 0:
@@ -599,6 +627,9 @@ def simulate_network_evolution(
     batch_size: Union[int, np.ndarray] = 32,
     node_resources: Optional[np.ndarray] = None,
     payoff_tolerance: Union[float, np.ndarray] = 0.0,
+    gamma: Optional[Union[float, np.ndarray]] = None,
+    sigma: Optional[Union[float, np.ndarray]] = None,
+    min_weight: Optional[Union[float, np.ndarray]] = None,
     random_seed: Optional[int] = None,
     symmetric: bool = True,
     # Distance fn specific args
@@ -680,12 +711,24 @@ def simulate_network_evolution(
             return param[idx]
         return param
     
+    # Infer mode
+    weighted_params_given = (gamma is not None) or (sigma is not None) or (min_weight is not None)
+    binary_switching = not weighted_params_given
+    
+    # Set defaults
+    if gamma is None: gamma = 2.0
+    if sigma is None: sigma = 0.1
+    if min_weight is None: min_weight = 1e-3
+    
+    # Initial payoffs
+    
     # Initial payoffs
     current_payoffs = _compute_all_payoffs(
         adj=adjacency, 
         d_mat=distance_matrix, 
         a=get_val(alpha, 0), 
         b=get_val(beta, 0), 
+        g=get_val(gamma, 0),
         cp=get_val(connectivity_penalty, 0),
         node_res=node_resources_arr,
         d_type=dist_type, 
@@ -698,9 +741,12 @@ def simulate_network_evolution(
     for step in tqdm(range(1, n_iterations), desc="Simulating network evolution", disable=not verbose):
         a_t = get_val(alpha, step)
         b_t = get_val(beta, step)
+        g_t = get_val(gamma, step)
         cp_t = get_val(connectivity_penalty, step)
         bs_t = int(get_val(batch_size, step))
         tol_t = get_val(payoff_tolerance, step)
+        s_t = get_val(sigma, step)
+        mw_t = get_val(min_weight, step)
         
         # Recompute current payoffs if params changed
         current_payoffs = _compute_all_payoffs(
@@ -708,6 +754,7 @@ def simulate_network_evolution(
             d_mat=distance_matrix, 
             a=a_t, 
             b=b_t, 
+            g=g_t,
             cp=cp_t,
             node_res=node_resources_arr,
             d_type=dist_type, 
@@ -725,7 +772,7 @@ def simulate_network_evolution(
             v_indices[mask] = np.random.randint(0, n_nodes, np.sum(mask))
             mask = u_indices == v_indices
             
-        _, _, beneficial = _evaluate_candidates_batch(
+        _, _, beneficial, new_weights = _evaluate_candidates_batch(
             current_adj=adjacency, 
             current_payoffs=current_payoffs, 
             candidates_u=u_indices, 
@@ -733,6 +780,7 @@ def simulate_network_evolution(
             distance_matrix=distance_matrix, 
             alpha=a_t, 
             beta=b_t, 
+            gamma=g_t,
             connectivity_penalty=cp_t,
             node_resources=node_resources_arr,
             distance_fn_type=dist_type,
@@ -740,7 +788,10 @@ def simulate_network_evolution(
             symmetric=symmetric, 
             weight_coefficient=weight_coefficient, 
             t_param=t, 
-            tolerance=tol_t
+            tolerance=tol_t,
+            binary_switching=binary_switching,
+            sigma=s_t,
+            min_weight=mw_t
         )
         
         if np.any(beneficial):
@@ -748,7 +799,7 @@ def simulate_network_evolution(
             for k in idx_ben:
                 u = u_indices[k]
                 v = v_indices[k]
-                val = 1.0 - adjacency[u, v]
+                val = new_weights[k]
                 adjacency[u, v] = val
                 if symmetric:
                     adjacency[v, u] = val
@@ -766,6 +817,7 @@ def _compute_impact_batch(
     dist_type: int,
     alpha: float,
     beta: float,
+    gamma: float,
     spatial_decay: float,
     weight_coefficient: float,
     t_param: float
@@ -779,11 +831,11 @@ def _compute_impact_batch(
         v = edges[k, 1]
         
         payoff_u_old = compute_node_payoff(
-            u, adjacency, distance_matrix, dist_type, alpha, beta, 0.0, None,
+            u, adjacency, distance_matrix, dist_type, alpha, beta, gamma, 0.0, None,
             spatial_decay, True, weight_coefficient, t_param
         )
         payoff_v_old = compute_node_payoff(
-            v, adjacency, distance_matrix, dist_type, alpha, beta, 0.0, None,
+            v, adjacency, distance_matrix, dist_type, alpha, beta, gamma, 0.0, None,
             spatial_decay, True, weight_coefficient, t_param
         )
 
@@ -792,11 +844,11 @@ def _compute_impact_batch(
         adj_lesioned[v, u] = 0.0
         
         payoff_u_new = compute_node_payoff(
-            u, adj_lesioned, distance_matrix, dist_type, alpha, beta, 0.0, None,
+            u, adj_lesioned, distance_matrix, dist_type, alpha, beta, gamma, 0.0, None,
             spatial_decay, True, weight_coefficient, t_param
         )
         payoff_v_new = compute_node_payoff(
-            v, adj_lesioned, distance_matrix, dist_type, alpha, beta, 0.0, None,
+            v, adj_lesioned, distance_matrix, dist_type, alpha, beta, gamma, 0.0, None,
             spatial_decay, True, weight_coefficient, t_param
         )
         
@@ -820,6 +872,9 @@ def find_optimal_alpha(
     n_jobs: int = -1,
     connectivity_penalty: float = 0.0,
     payoff_tolerance: float = 0.0,
+    gamma: Optional[float] = None,
+    sigma: Optional[float] = None,
+    min_weight: Optional[float] = None,
     verbose: bool = True,
     **kwargs
 ) -> Dict[str, Any]:
@@ -888,6 +943,9 @@ def find_optimal_alpha(
             batch_size=batch_size_vec,
             symmetric=symmetric,
             payoff_tolerance=payoff_tolerance,
+            gamma=gamma,
+            sigma=sigma,
+            min_weight=min_weight,
             verbose=verbose,
             **kwargs
         )

@@ -468,7 +468,8 @@ def _evaluate_candidates_batch(
     tolerance: Union[float, np.ndarray],
     binary_switching: bool,
     sigma: float,
-    min_weight: float
+    min_weight: float,
+    perturbation_type: int
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     
     n_candidates = len(candidates_u)
@@ -489,10 +490,41 @@ def _evaluate_candidates_batch(
                 cand_adj[v, u] = val
             new_weight = val
         else:
-            # Gaussian perturbation
             current_weight = cand_adj[u, v]
-            perturbation = np.random.normal(0, sigma)
-            new_weight = current_weight + perturbation
+            
+            # 0: Gaussian (Additive)
+            if perturbation_type == 0:
+                perturbation = np.random.normal(0, sigma)
+                new_weight = current_weight + perturbation
+            # 1: LogNormal (Multiplicative)
+            elif perturbation_type == 1:
+                # LogNormal is strictly positive, so we multiply.
+                # If current weight is 0, we can't grow it multiplicatively from 0.
+                # So we add a small epsilon if it's 0 to allow genesis, 
+                # or we accept that 0 stays 0. 
+                # Given "game theoretic" usually implies growing connections, 
+                # let's assume we perturb a base value if 0. 
+                # BUT, to be safe and simple: just multiply. 
+                if current_weight < 1e-9:
+                    # If effectively 0, treat as small value to allow growth?
+                    # Or just add a small additive component?
+                    # Let's stick to pure multiplicative for now as per plan standard.
+                    # User didn't specify handling 0 explicitly differently.
+                    # We'll actually add a small eps for genesis if 0, else multiply.
+                    
+                    # Actually, standard lognormal multiplication on 0 is 0.
+                    # Let's assume user wants to perturb existing weights.
+                    # For new edges, maybe they need Gaussian?
+                    # Let's add a small noise component if 0 so it can grow.
+                    perturbation = np.random.lognormal(0, sigma)
+                    new_weight = (current_weight + 1e-6) * perturbation
+                else:
+                    perturbation = np.random.lognormal(0, sigma)
+                    new_weight = current_weight * perturbation
+            # 2: Exponential / Laplace (Additive Symmetric)
+            else:
+                perturbation = np.random.laplace(0, sigma)
+                new_weight = current_weight + perturbation
             
             # Clamp
             if new_weight > 1.0: new_weight = 1.0
@@ -631,6 +663,7 @@ def simulate_network_evolution(
     gamma: Optional[Union[float, np.ndarray]] = None,
     sigma: Optional[Union[float, np.ndarray]] = None,
     min_weight: Optional[Union[float, np.ndarray]] = None,
+    perturbation_type: str = 'gaussian',
     random_seed: Optional[int] = None,
     symmetric: bool = True,
     # Distance fn specific args
@@ -648,7 +681,7 @@ def simulate_network_evolution(
     (unilateral consent), subject to a tolerance threshold.
 
     If `gamma`, `sigma`, or `min_weight` are provided, the simulation runs in "weighted" mode,
-    where edge weights are continuous and perturbed by Gaussian noise. Otherwise, it runs in
+    where edge weights are continuous and perturbed by noise. Otherwise, it runs in
     "binary" mode where edges are toggled between 0 and 1.
 
     Args:
@@ -664,8 +697,11 @@ def simulate_network_evolution(
         node_resources: Optional resources for each node to subsidize wiring costs.
         payoff_tolerance: Minimum payoff improvement required to accept a change.
         gamma: Exponent for the adjacency weight in wiring cost (non-linearity). If None, defaults to 2.0 or unused in binary mode.
-        sigma: Standard deviation for Gaussian perturbation of weights. If None, defaults to 0.1 or unused in binary mode.
+        sigma: Standard deviation/Scale for perturbation of weights. If None, defaults to 0.1 or unused in binary mode.
         min_weight: Minimum weight threshold; weights below this are set to 0. If None, defaults to 1e-3 or unused in binary mode.
+        perturbation_type: Distribution to use for weight perturbation. 
+                           Options: 'gaussian', 'lognormal', 'exponential'. 
+                           Default: 'gaussian'.
         random_seed: Seed for random number generator.
         symmetric: If True, enforces undirected edges (symmetry).
         spatial_decay: Decay parameter for propagation distance.
@@ -696,6 +732,15 @@ def simulate_network_evolution(
     elif "topological" in name: dist_type = 4
     else: dist_type = 0 # Default
     
+    # Map perturbation_type to int
+    p_type_str = perturbation_type.lower()
+    if "gaussian" in p_type_str: p_type = 0
+    elif "lognormal" in p_type_str: p_type = 1
+    elif "exponential" in p_type_str: p_type = 2
+    else: 
+        raise ValueError(f"Unknown perturbation_type: {perturbation_type}. "
+                         "Must be one of ['gaussian', 'lognormal', 'exponential']")
+
     n_nodes = distance_matrix.shape[0]
     
     if initial_adjacency is None:
@@ -727,8 +772,6 @@ def simulate_network_evolution(
     if gamma is None: gamma = 2.0
     if sigma is None: sigma = 0.1
     if min_weight is None: min_weight = 1e-3
-    
-    # Initial payoffs
     
     # Initial payoffs
     current_payoffs = _compute_all_payoffs(
@@ -799,7 +842,8 @@ def simulate_network_evolution(
             tolerance=tol_t,
             binary_switching=binary_switching,
             sigma=s_t,
-            min_weight=mw_t
+            min_weight=mw_t,
+            perturbation_type=p_type
         )
         
         if np.any(beneficial):

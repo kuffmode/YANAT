@@ -406,6 +406,7 @@ def compute_node_payoff(
         distance_fn_type: Integer code for distance function (0: prop, 1: res, 2: heat, 3: sp, 4: topo).
         alpha: Weight of the distance term.
         beta: Weight of the wiring cost term.
+        gamma: Exponent for the adjacency weight in wiring cost (non-linearity).
         connectivity_penalty: Penalty for disconnected components.
         node_resources: Optional vector of node resources.
         spatial_decay: Parameter for propagation distance.
@@ -642,9 +643,13 @@ def simulate_network_evolution(
     """
     Simulates the evolution of a network through game-theoretic payoff optimization using Numba.
 
-    At each step, random edges are selected and "flipped" (added or removed). 
+    At each step, random edges are selected and "flipped" (added or removed) or perturbed.
     The change is accepted if it improves the payoff for at least one of the nodes involved 
     (unilateral consent), subject to a tolerance threshold.
+
+    If `gamma`, `sigma`, or `min_weight` are provided, the simulation runs in "weighted" mode,
+    where edge weights are continuous and perturbed by Gaussian noise. Otherwise, it runs in
+    "binary" mode where edges are toggled between 0 and 1.
 
     Args:
         distance_matrix: Pre-computed Euclidean distance matrix (n_nodes, n_nodes).
@@ -658,6 +663,9 @@ def simulate_network_evolution(
         batch_size: Number of potential edge flips to evaluate per iteration.
         node_resources: Optional resources for each node to subsidize wiring costs.
         payoff_tolerance: Minimum payoff improvement required to accept a change.
+        gamma: Exponent for the adjacency weight in wiring cost (non-linearity). If None, defaults to 2.0 or unused in binary mode.
+        sigma: Standard deviation for Gaussian perturbation of weights. If None, defaults to 0.1 or unused in binary mode.
+        min_weight: Minimum weight threshold; weights below this are set to 0. If None, defaults to 1e-3 or unused in binary mode.
         random_seed: Seed for random number generator.
         symmetric: If True, enforces undirected edges (symmetry).
         spatial_decay: Decay parameter for propagation distance.
@@ -871,7 +879,7 @@ def find_optimal_alpha(
     symmetric: bool = True,
     n_jobs: int = -1,
     connectivity_penalty: float = 0.0,
-    payoff_tolerance: float = 0.0,
+    payoff_tolerance: Union[float, np.ndarray] = 0.0,
     gamma: Optional[float] = None,
     sigma: Optional[float] = None,
     min_weight: Optional[float] = None,
@@ -900,6 +908,9 @@ def find_optimal_alpha(
         n_jobs: Number of parallel jobs.
         connectivity_penalty: Penalty for connectivity.
         payoff_tolerance: Threshold for accepting new configuration.
+        gamma: Exponent for the adjacency weight in wiring cost (non-linearity).
+        sigma: Standard deviation for Gaussian perturbation of weights.
+        min_weight: Minimum weight threshold.
         verbose: If True, prints search progress.
         **kwargs: Additional arguments passed to `simulate_network_evolution`.
 
